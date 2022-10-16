@@ -202,3 +202,103 @@ npm init -y
 npm install web3 
 ```
 
+发送交易，见transaction.js
+
+## 4.2 部署合约
+
+安装solidity编译器依赖
+
+```
+npm install solc@0.8.0
+```
+
+编写智能合约
+
+部署等等（操作过程大体相似）
+
+## 4.3 读取和写入数据
+
+创建新文件get.js编写脚本读取数据
+
+# 5 Delegation DAO（上）
+
+## 5.1 Moonbeam 共识
+
+**Moonbeam 共识**
+
+使用基于PoS的混合共识
+
+平行链手机交易和产生区块
+
+Nimbus从收集人有效集为每个区块筛选有效作者
+
+随后区块会提交到波卡中继链提交并进行最终确定
+
+**Moonbeam质押**
+
+两个角色：候选收集人和委托人
+
+活跃收集人集的评判标准：总绑定量 = 自身绑定量 + 总委托数量。选前64位
+
+每个候选收集人最多能有300位有效委托人
+
+候选收集人通过运行收集人节点获得委托数
+
+**委托和撤销**
+
+委托撤销在同一段时间内只能有一个
+
+**什么是预编译**
+
+一段预编译的代码或者智能合约
+
+最初被以太坊所使用，用于常用的加密和哈希算法，如SHA256、RIPEMD56、Keccak256等
+
+一种Substrate源语，是构建跨链交互和与Substrate pallet交互的重要组成部分
+
+**Moonbeam拥有的预编译**
+
+Parachain Staking
+
+Pallet Democracy
+
+XCM Transactor
+
+xTokens
+
+Author Mapping
+
+Assets-ERC-20
+
+等等
+
+## 5.2 Staking 预编译
+
+parachainStaking 是substrate 的一个pallet ，Solidity智能合约接口StakingInterface，它两一一映射，就是说通过这种方式我们写个智能合约就可以和moonbeam pallet交互了。虽然可以直接与Moonbeam进行交互，但是合约的方式更加灵活。这个接口在substrate runtime中运行，结果会返回给调用者（智能合约）
+
+**质押预编译交互**
+
+获得合约接口
+
+https://docs.moonbeam.network/cn/builders/pallets-precompiles/precompiles/staking/	
+
+0x0000000000000000000000000000000000000800
+
+通过delete函数质押
+
+## 5.3 DelegationDAO概念和设计
+
+The DAO 最有名，直接导致了以太坊硬分叉
+
+**DelegationDAO的要求**
+
+Delegation DAO的成员可以将其Token充值到DAO智能合约
+
+DAO会将总质押池委托给预先选定的候选收集人节点
+
+成员可以从DAO提取他们的质押的Token并分享质押池中一定比例的质押奖励
+
+DAO基于状态而设计
+
+
+

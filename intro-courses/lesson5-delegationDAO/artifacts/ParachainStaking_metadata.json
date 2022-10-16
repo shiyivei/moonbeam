@@ -1,0 +1,944 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "cancel_candidate_bond_less",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					}
+				],
+				"name": "cancel_delegation_request",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "candidateCount",
+						"type": "uint256"
+					}
+				],
+				"name": "cancel_leave_candidates",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "cancel_leave_delegators",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "less",
+						"type": "uint256"
+					}
+				],
+				"name": "candidate_bond_less",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "more",
+						"type": "uint256"
+					}
+				],
+				"name": "candidate_bond_more",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "candidate_count",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					}
+				],
+				"name": "candidate_delegation_count",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "collator",
+						"type": "address"
+					}
+				],
+				"name": "collator_nomination_count",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "candidateDelegationCount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "delegatorDelegationCount",
+						"type": "uint256"
+					}
+				],
+				"name": "delegate",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "more",
+						"type": "uint256"
+					}
+				],
+				"name": "delegator_bond_more",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "delegator",
+						"type": "address"
+					}
+				],
+				"name": "delegator_delegation_count",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					}
+				],
+				"name": "execute_candidate_bond_less",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "delegator",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					}
+				],
+				"name": "execute_delegation_request",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "candidateDelegationCount",
+						"type": "uint256"
+					}
+				],
+				"name": "execute_leave_candidates",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "delegator",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "delegatorDelegationCount",
+						"type": "uint256"
+					}
+				],
+				"name": "execute_leave_delegators",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "go_offline",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "go_online",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					}
+				],
+				"name": "is_candidate",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "delegator",
+						"type": "address"
+					}
+				],
+				"name": "is_delegator",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "nominator",
+						"type": "address"
+					}
+				],
+				"name": "is_nominator",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					}
+				],
+				"name": "is_selected_candidate",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "candidateCount",
+						"type": "uint256"
+					}
+				],
+				"name": "join_candidates",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "candidateCount",
+						"type": "uint256"
+					}
+				],
+				"name": "leave_candidates",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "nominatorNominationCount",
+						"type": "uint256"
+					}
+				],
+				"name": "leave_nominators",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "min_delegation",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "min_nomination",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "collator",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "collatorNominationCount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "nominatorNominationCount",
+						"type": "uint256"
+					}
+				],
+				"name": "nominate",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "less",
+						"type": "uint256"
+					}
+				],
+				"name": "nominator_bond_less",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "more",
+						"type": "uint256"
+					}
+				],
+				"name": "nominator_bond_more",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "nominator",
+						"type": "address"
+					}
+				],
+				"name": "nominator_nomination_count",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "round",
+						"type": "uint256"
+					}
+				],
+				"name": "points",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "collator",
+						"type": "address"
+					}
+				],
+				"name": "revoke_nomination",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "less",
+						"type": "uint256"
+					}
+				],
+				"name": "schedule_candidate_bond_less",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "less",
+						"type": "uint256"
+					}
+				],
+				"name": "schedule_delegator_bond_less",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "candidateCount",
+						"type": "uint256"
+					}
+				],
+				"name": "schedule_leave_candidates",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "schedule_leave_delegators",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "candidate",
+						"type": "address"
+					}
+				],
+				"name": "schedule_revoke_delegation",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "selected_candidates",
+				"outputs": [
+					{
+						"internalType": "address[]",
+						"name": "",
+						"type": "address[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "The Moonbeam Team",
+			"kind": "dev",
+			"methods": {
+				"cancel_candidate_bond_less()": {
+					"details": "Cancel pending candidate bond request Selector: 583d0fdc"
+				},
+				"cancel_delegation_request(address)": {
+					"details": "Cancel pending delegation request (already made in support of input by caller) Selector: 7284cf50",
+					"params": {
+						"candidate": "The address of the candidate"
+					}
+				},
+				"cancel_leave_candidates(uint256)": {
+					"details": "Cancel request to leave the set of collator candidates Selector: 0880b3e2",
+					"params": {
+						"candidateCount": "The number of candidates in the CandidatePool"
+					}
+				},
+				"cancel_leave_delegators()": {
+					"details": "Cancel request to leave the set of delegators Selector: 2a987643"
+				},
+				"candidate_bond_less(uint256)": {
+					"details": "Request to bond less for collator candidates Selector: 289b6ba7",
+					"params": {
+						"less": "The amount to be subtracted from self-bond and unreserved"
+					}
+				},
+				"candidate_bond_more(uint256)": {
+					"details": "Request to bond more for collator candidates Selector: c57bd3a8",
+					"params": {
+						"more": "The additional amount self-bonded"
+					}
+				},
+				"candidate_count()": {
+					"details": "Get the CandidateCount weight hint Selector: 4b1c4c29",
+					"returns": {
+						"_0": "The CandidateCount weight hint"
+					}
+				},
+				"candidate_delegation_count(address)": {
+					"details": "Get the CandidateDelegationCount weight hint Selector: 815b796c",
+					"params": {
+						"candidate": "The address for which we are querying the nomination count"
+					},
+					"returns": {
+						"_0": "The number of nominations backing the collator"
+					}
+				},
+				"collator_nomination_count(address)": {
+					"details": "Get the CollatorNominationCount weight hint Selector: 0ad6a7be",
+					"params": {
+						"collator": "The address for which we are querying the nomination count"
+					},
+					"returns": {
+						"_0": "The number of nominations backing the collator"
+					}
+				},
+				"delegate(address,uint256,uint256,uint256)": {
+					"details": "Make a delegation in support of a collator candidate Selector: 829f5ee3",
+					"params": {
+						"amount": "The amount bonded in support of the collator candidate",
+						"candidate": "The address of the supported collator candidate",
+						"candidateDelegationCount": "The number of delegations in support of the candidate",
+						"delegatorDelegationCount": "The number of existing delegations by the caller"
+					}
+				},
+				"delegator_bond_more(address,uint256)": {
+					"details": "Bond more for delegators with respect to a specific collator candidate Selector: f8331108",
+					"params": {
+						"candidate": "The address of the collator candidate for which delegation shall increase",
+						"more": "The amount by which the delegation is increased"
+					}
+				},
+				"delegator_delegation_count(address)": {
+					"details": "Get the DelegatorDelegationCount weight hint Selector: fbc51bca",
+					"params": {
+						"delegator": "The address for which we are querying the delegation count"
+					},
+					"returns": {
+						"_0": "The number of delegations made by the delegator"
+					}
+				},
+				"execute_candidate_bond_less(address)": {
+					"details": "Execute pending candidate bond request Selector: a9a2b8b7",
+					"params": {
+						"candidate": "The address for the candidate for which the request will be executed"
+					}
+				},
+				"execute_delegation_request(address,address)": {
+					"details": "Execute pending delegation request (if exists && is due) Selector: e42366a6",
+					"params": {
+						"candidate": "The address of the candidate",
+						"delegator": "The address of the delegator"
+					}
+				},
+				"execute_leave_candidates(address,uint256)": {
+					"details": "Execute due request to leave the set of collator candidates Selector: 3fdc4c30",
+					"params": {
+						"candidate": "The candidate address for which the pending exit request will be executed",
+						"candidateDelegationCount": "The number of delegations for the candidate to be revoked"
+					}
+				},
+				"execute_leave_delegators(address,uint256)": {
+					"details": "Execute request to leave the set of delegators and revoke all delegations Selector: a84a7468",
+					"params": {
+						"delegator": "The leaving delegator",
+						"delegatorDelegationCount": "The number of active delegations to be revoked by delegator"
+					}
+				},
+				"go_offline()": {
+					"details": "Temporarily leave the set of collator candidates without unbonding Selector: 767e0450"
+				},
+				"go_online()": {
+					"details": "Rejoin the set of collator candidates if previously had called `go_offline` Selector: d2f73ceb"
+				},
+				"is_candidate(address)": {
+					"details": "Check whether the specified address is currently a collator candidate Selector: 8545c833",
+					"params": {
+						"candidate": "the address that we want to confirm is a collator andidate"
+					},
+					"returns": {
+						"_0": "A boolean confirming whether the address is a collator candidate"
+					}
+				},
+				"is_delegator(address)": {
+					"details": "Check whether the specified address is currently a staking delegator Selector: 1f030587",
+					"params": {
+						"delegator": "the address that we want to confirm is a delegator"
+					},
+					"returns": {
+						"_0": "A boolean confirming whether the address is a delegator"
+					}
+				},
+				"is_nominator(address)": {
+					"details": "Check whether the specified address is currently a staking nominator Selector: 8e5080e7",
+					"params": {
+						"nominator": "the address that we want to confirm is a nominator"
+					},
+					"returns": {
+						"_0": "A boolean confirming whether the address is a nominator"
+					}
+				},
+				"is_selected_candidate(address)": {
+					"details": "Check whether the specifies address is currently a part of the active set Selector: 8f6d27c7",
+					"params": {
+						"candidate": "the address that we want to confirm is a part of the active set"
+					},
+					"returns": {
+						"_0": "A boolean confirming whether the address is a part of the active set"
+					}
+				},
+				"join_candidates(uint256,uint256)": {
+					"details": "Join the set of collator candidates Selector: 0a1bff60",
+					"params": {
+						"amount": "The amount self-bonded by the caller to become a collator candidate",
+						"candidateCount": "The number of candidates in the CandidatePool"
+					}
+				},
+				"leave_candidates(uint256)": {
+					"details": "Leave the set of collator candidates Selector: 72b02a31",
+					"params": {
+						"candidateCount": "The number of candidates in the CandidatePool"
+					}
+				},
+				"leave_nominators(uint256)": {
+					"details": "Request to leave the set of nominators Selector: b71d2153",
+					"params": {
+						"nominatorNominationCount": "The number of active nominations to be revoked by caller"
+					}
+				},
+				"min_delegation()": {
+					"details": "Get the minimum delegation amount Selector: 72ce8933",
+					"returns": {
+						"_0": "The minimum delegation amount"
+					}
+				},
+				"min_nomination()": {
+					"details": "Get the minimum nomination amount Selector: c9f593b2",
+					"returns": {
+						"_0": "The minimum nomination amount"
+					}
+				},
+				"nominate(address,uint256,uint256,uint256)": {
+					"details": "Make a nomination in support of a collator candidate Selector: 49df6eb3",
+					"params": {
+						"amount": "The amount bonded in support of the collator candidate",
+						"collator": "The address of the supported collator candidate",
+						"collatorNominationCount": "The number of nominations in support of the candidate",
+						"nominatorNominationCount": "The number of existing nominations by the caller"
+					}
+				},
+				"nominator_bond_less(address,uint256)": {
+					"details": "Request to bond less for nominators with respect to a specific collator candidate Selector: f6a52569",
+					"params": {
+						"candidate": "The address of the collator candidate for which nomination is decreased",
+						"less": "The amount by which the nomination is decreased"
+					}
+				},
+				"nominator_bond_more(address,uint256)": {
+					"details": "Request to bond more for nominators with respect to a specific collator candidate Selector: 971d44c8",
+					"params": {
+						"candidate": "The address of the collator candidate for which nomination is increased",
+						"more": "The amount by which the nomination is increased"
+					}
+				},
+				"nominator_nomination_count(address)": {
+					"details": "Get the NominatorNominationCount weight hint Selector: dae5659b",
+					"params": {
+						"nominator": "The address for which we are querying the nomination count"
+					},
+					"returns": {
+						"_0": "The number of nominations made by the nominator"
+					}
+				},
+				"points(uint256)": {
+					"details": "Total points awarded to all collators in a particular round Selector: 9799b4e7",
+					"params": {
+						"round": "the round for which we are querying the points total"
+					},
+					"returns": {
+						"_0": "The total points awarded to all collators in the round"
+					}
+				},
+				"revoke_nomination(address)": {
+					"details": "Request to revoke an existing nomination Selector: 4b65c34b",
+					"params": {
+						"collator": "The address of the collator candidate which will no longer be supported"
+					}
+				},
+				"schedule_candidate_bond_less(uint256)": {
+					"details": "Request to bond less for collator candidates Selector: 034c47bc",
+					"params": {
+						"less": "The amount to be subtracted from self-bond and unreserved"
+					}
+				},
+				"schedule_delegator_bond_less(address,uint256)": {
+					"details": "Request to bond less for delegators with respect to a specific collator candidate Selector: 00043acf",
+					"params": {
+						"candidate": "The address of the collator candidate for which delegation shall decrease",
+						"less": "The amount by which the delegation is decreased (upon execution)"
+					}
+				},
+				"schedule_leave_candidates(uint256)": {
+					"details": "Request to leave the set of collator candidates Selector: 60afbac6",
+					"params": {
+						"candidateCount": "The number of candidates in the CandidatePool"
+					}
+				},
+				"schedule_leave_delegators()": {
+					"details": "Request to leave the set of delegators Selector: 65a5bbd0"
+				},
+				"schedule_revoke_delegation(address)": {
+					"details": "Request to revoke an existing delegation Selector: 22266e75",
+					"params": {
+						"candidate": "The address of the collator candidate which will no longer be supported"
+					}
+				},
+				"selected_candidates()": {
+					"details": "Get the selected candidates for the current round Selector: 0x89f47a21",
+					"returns": {
+						"_0": "The selected candidate accounts"
+					}
+				}
+			},
+			"title": "The interface through which solidity contracts will interact with Parachain Staking We follow this same interface including four-byte function selectors, in the precompile that wraps the pallet Address :    0x0000000000000000000000000000000000000800",
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {
+				"candidate_bond_less(uint256)": {
+					"notice": "DEPRECATED, replaced by schedule_candidate_bond_less, execute_candidate_bond_request, cancel_candidate_bond_request"
+				},
+				"collator_nomination_count(address)": {
+					"notice": "DEPRECATED, replaced by candidate_delegation_count"
+				},
+				"is_nominator(address)": {
+					"notice": "DEPRECATED, replaced by is_delegator"
+				},
+				"leave_candidates(uint256)": {
+					"notice": "DEPRECATED, replaced by schedule_leave_candidates, execute_leave_candidates, cancel_leave_candidates"
+				},
+				"leave_nominators(uint256)": {
+					"notice": "DEPRECATED, replaced by schedule_leave_delegators, execute_leave_delegators, cancel_leave_delegators"
+				},
+				"min_nomination()": {
+					"notice": "DEPRECATED, replaced by min_delegation"
+				},
+				"nominate(address,uint256,uint256,uint256)": {
+					"notice": "DEPRECATED, replaced by delegate"
+				},
+				"nominator_bond_less(address,uint256)": {
+					"notice": "DEPRECATED, replaced by schedule_delegator_bond_less, execute_delegation_request, cancel_delegation_request"
+				},
+				"nominator_bond_more(address,uint256)": {
+					"notice": "DEPRECATED, replaced by delegator_bond_more"
+				},
+				"nominator_nomination_count(address)": {
+					"notice": "DEPRECATED, replaced by delegator_delegation_count"
+				},
+				"revoke_nomination(address)": {
+					"notice": "DEPRECATED, replaced by schedule_revoke_delegation, execute_delegation_request, cancel_delegation_request"
+				}
+			},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"StakingInterface.sol": "ParachainStaking"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"StakingInterface.sol": {
+			"keccak256": "0x3db0e95ef9910e7d86f3cdb04dd2c38c40c3a556088b7b16c9f7d0c9ad8815bc",
+			"license": "GPL-3.0-only",
+			"urls": [
+				"bzz-raw://268765d8ae4e575e6a43de429db405ab6ad4e7a5d0a123a603ed66b5bc5cd713",
+				"dweb:/ipfs/QmYFyieAgvQHuqKhet9ue8FnzWyvdBbGWvu6X8A253QJiA"
+			]
+		}
+	},
+	"version": 1
+}

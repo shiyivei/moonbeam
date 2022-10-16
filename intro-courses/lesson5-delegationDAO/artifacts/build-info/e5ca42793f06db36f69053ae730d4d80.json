@@ -1,0 +1,3982 @@
+{
+	"id": "e5ca42793f06db36f69053ae730d4d80",
+	"_format": "hh-sol-build-info-1",
+	"solcVersion": "0.8.7",
+	"solcLongVersion": "0.8.7+commit.e28d00a7",
+	"input": {
+		"language": "Solidity",
+		"sources": {
+			"StakingInterface.sol": {
+				"content": "// SPDX-License-Identifier: GPL-3.0-only\npragma solidity >=0.8.0;\n\n/**\n * @author The Moonbeam Team\n * @title The interface through which solidity contracts will interact with Parachain Staking\n * We follow this same interface including four-byte function selectors, in the precompile that\n * wraps the pallet\n * Address :    0x0000000000000000000000000000000000000800\n */\n\ninterface ParachainStaking {\n    /// DEPRECATED, replaced by is_delegator\n    /// @dev Check whether the specified address is currently a staking nominator\n    /// Selector: 8e5080e7\n    /// @param nominator the address that we want to confirm is a nominator\n    /// @return A boolean confirming whether the address is a nominator\n    function is_nominator(address nominator) external view returns (bool);\n\n    /// @dev Check whether the specified address is currently a staking delegator\n    /// Selector: 1f030587\n    /// @param delegator the address that we want to confirm is a delegator\n    /// @return A boolean confirming whether the address is a delegator\n    function is_delegator(address delegator) external view returns (bool);\n\n    /// @dev Check whether the specified address is currently a collator candidate\n    /// Selector: 8545c833\n    /// @param candidate the address that we want to confirm is a collator andidate\n    /// @return A boolean confirming whether the address is a collator candidate\n    function is_candidate(address candidate) external view returns (bool);\n\n    /// @dev Check whether the specifies address is currently a part of the active set\n    /// Selector: 8f6d27c7\n    /// @param candidate the address that we want to confirm is a part of the active set\n    /// @return A boolean confirming whether the address is a part of the active set\n    function is_selected_candidate(address candidate)\n        external\n        view\n        returns (bool);\n\n    /// @dev Total points awarded to all collators in a particular round\n    /// Selector: 9799b4e7\n    /// @param round the round for which we are querying the points total\n    /// @return The total points awarded to all collators in the round\n    function points(uint256 round) external view returns (uint256);\n\n    /// DEPRECATED, replaced by min_delegation\n    /// @dev Get the minimum nomination amount\n    /// Selector: c9f593b2\n    /// @return The minimum nomination amount\n    function min_nomination() external view returns (uint256);\n\n    /// @dev Get the minimum delegation amount\n    /// Selector: 72ce8933\n    /// @return The minimum delegation amount\n    function min_delegation() external view returns (uint256);\n\n    /// @dev Get the CandidateCount weight hint\n    /// Selector: 4b1c4c29\n    /// @return The CandidateCount weight hint\n    function candidate_count() external view returns (uint256);\n\n    /// DEPRECATED, replaced by candidate_delegation_count\n    /// @dev Get the CollatorNominationCount weight hint\n    /// Selector: 0ad6a7be\n    /// @param collator The address for which we are querying the nomination count\n    /// @return The number of nominations backing the collator\n    function collator_nomination_count(address collator)\n        external\n        view\n        returns (uint256);\n\n    /// @dev Get the CandidateDelegationCount weight hint\n    /// Selector: 815b796c\n    /// @param candidate The address for which we are querying the nomination count\n    /// @return The number of nominations backing the collator\n    function candidate_delegation_count(address candidate)\n        external\n        view\n        returns (uint256);\n\n    /// DEPRECATED, replaced by delegator_delegation_count\n    /// @dev Get the NominatorNominationCount weight hint\n    /// Selector: dae5659b\n    /// @param nominator The address for which we are querying the nomination count\n    /// @return The number of nominations made by the nominator\n    function nominator_nomination_count(address nominator)\n        external\n        view\n        returns (uint256);\n\n    /// @dev Get the DelegatorDelegationCount weight hint\n    /// Selector: fbc51bca\n    /// @param delegator The address for which we are querying the delegation count\n    /// @return The number of delegations made by the delegator\n    function delegator_delegation_count(address delegator)\n        external\n        view\n        returns (uint256);\n\n    /// @dev Get the selected candidates for the current round\n    /// Selector: 0x89f47a21\n    /// @return The selected candidate accounts\n    function selected_candidates() external view returns (address[] memory);\n\n    /// @dev Join the set of collator candidates\n    /// Selector: 0a1bff60\n    /// @param amount The amount self-bonded by the caller to become a collator candidate\n    /// @param candidateCount The number of candidates in the CandidatePool\n    function join_candidates(uint256 amount, uint256 candidateCount) external;\n\n    /// DEPRECATED, replaced by schedule_leave_candidates, execute_leave_candidates,\n    /// cancel_leave_candidates\n    /// @dev Leave the set of collator candidates\n    /// Selector: 72b02a31\n    /// @param candidateCount The number of candidates in the CandidatePool\n    function leave_candidates(uint256 candidateCount) external;\n\n    /// @dev Request to leave the set of collator candidates\n    /// Selector: 60afbac6\n    /// @param candidateCount The number of candidates in the CandidatePool\n    function schedule_leave_candidates(uint256 candidateCount) external;\n\n    /// @dev Execute due request to leave the set of collator candidates\n    /// Selector: 3fdc4c30\n    /// @param candidate The candidate address for which the pending exit request will be executed\n    /// @param candidateDelegationCount The number of delegations for the candidate to be revoked\n    function execute_leave_candidates(\n        address candidate,\n        uint256 candidateDelegationCount\n    ) external;\n\n    /// @dev Cancel request to leave the set of collator candidates\n    /// Selector: 0880b3e2\n    /// @param candidateCount The number of candidates in the CandidatePool\n    function cancel_leave_candidates(uint256 candidateCount) external;\n\n    /// @dev Temporarily leave the set of collator candidates without unbonding\n    /// Selector: 767e0450\n    function go_offline() external;\n\n    /// @dev Rejoin the set of collator candidates if previously had called `go_offline`\n    /// Selector: d2f73ceb\n    function go_online() external;\n\n    /// @dev Request to bond more for collator candidates\n    /// Selector: c57bd3a8\n    /// @param more The additional amount self-bonded\n    function candidate_bond_more(uint256 more) external;\n\n    /// DEPRECATED, replaced by schedule_candidate_bond_less, execute_candidate_bond_request,\n    /// cancel_candidate_bond_request\n    /// @dev Request to bond less for collator candidates\n    /// Selector: 289b6ba7\n    /// @param less The amount to be subtracted from self-bond and unreserved\n    function candidate_bond_less(uint256 less) external;\n\n    /// @dev Request to bond less for collator candidates\n    /// Selector: 034c47bc\n    /// @param less The amount to be subtracted from self-bond and unreserved\n    function schedule_candidate_bond_less(uint256 less) external;\n\n    /// @dev Execute pending candidate bond request\n    /// Selector: a9a2b8b7\n    /// @param candidate The address for the candidate for which the request will be executed\n    function execute_candidate_bond_less(address candidate) external;\n\n    /// @dev Cancel pending candidate bond request\n    /// Selector: 583d0fdc\n    function cancel_candidate_bond_less() external;\n\n    /// DEPRECATED, replaced by delegate\n    /// @dev Make a nomination in support of a collator candidate\n    /// Selector: 49df6eb3\n    /// @param collator The address of the supported collator candidate\n    /// @param amount The amount bonded in support of the collator candidate\n    /// @param collatorNominationCount The number of nominations in support of the candidate\n    /// @param nominatorNominationCount The number of existing nominations by the caller\n    function nominate(\n        address collator,\n        uint256 amount,\n        uint256 collatorNominationCount,\n        uint256 nominatorNominationCount\n    ) external;\n\n    /// @dev Make a delegation in support of a collator candidate\n    /// Selector: 829f5ee3\n    /// @param candidate The address of the supported collator candidate\n    /// @param amount The amount bonded in support of the collator candidate\n    /// @param candidateDelegationCount The number of delegations in support of the candidate\n    /// @param delegatorDelegationCount The number of existing delegations by the caller\n    function delegate(\n        address candidate,\n        uint256 amount,\n        uint256 candidateDelegationCount,\n        uint256 delegatorDelegationCount\n    ) external;\n\n    /// DEPRECATED, replaced by schedule_leave_delegators, execute_leave_delegators,\n    /// cancel_leave_delegators\n    /// @dev Request to leave the set of nominators\n    /// Selector: b71d2153\n    /// @param nominatorNominationCount The number of active nominations to be revoked by caller\n    function leave_nominators(uint256 nominatorNominationCount) external;\n\n    /// @dev Request to leave the set of delegators\n    /// Selector: 65a5bbd0\n    function schedule_leave_delegators() external;\n\n    /// @dev Execute request to leave the set of delegators and revoke all delegations\n    /// Selector: a84a7468\n    /// @param delegator The leaving delegator\n    /// @param delegatorDelegationCount The number of active delegations to be revoked by delegator\n    function execute_leave_delegators(\n        address delegator,\n        uint256 delegatorDelegationCount\n    ) external;\n\n    /// @dev Cancel request to leave the set of delegators\n    /// Selector: 2a987643\n    function cancel_leave_delegators() external;\n\n    /// DEPRECATED, replaced by schedule_revoke_delegation, execute_delegation_request,\n    /// cancel_delegation_request\n    /// @dev Request to revoke an existing nomination\n    /// Selector: 4b65c34b\n    /// @param collator The address of the collator candidate which will no longer be supported\n    function revoke_nomination(address collator) external;\n\n    /// @dev Request to revoke an existing delegation\n    /// Selector: 22266e75\n    /// @param candidate The address of the collator candidate which will no longer be supported\n    function schedule_revoke_delegation(address candidate) external;\n\n    /// DEPRECATED, replaced by delegator_bond_more\n    /// @dev Request to bond more for nominators with respect to a specific collator candidate\n    /// Selector: 971d44c8\n    /// @param candidate The address of the collator candidate for which nomination is increased\n    /// @param more The amount by which the nomination is increased\n    function nominator_bond_more(address candidate, uint256 more) external;\n\n    /// @dev Bond more for delegators with respect to a specific collator candidate\n    /// Selector: f8331108\n    /// @param candidate The address of the collator candidate for which delegation shall increase\n    /// @param more The amount by which the delegation is increased\n    function delegator_bond_more(address candidate, uint256 more) external;\n\n    /// DEPRECATED, replaced by schedule_delegator_bond_less, execute_delegation_request,\n    /// cancel_delegation_request\n    /// @dev Request to bond less for nominators with respect to a specific collator candidate\n    /// Selector: f6a52569\n    /// @param candidate The address of the collator candidate for which nomination is decreased\n    /// @param less The amount by which the nomination is decreased\n    function nominator_bond_less(address candidate, uint256 less) external;\n\n    /// @dev Request to bond less for delegators with respect to a specific collator candidate\n    /// Selector: 00043acf\n    /// @param candidate The address of the collator candidate for which delegation shall decrease\n    /// @param less The amount by which the delegation is decreased (upon execution)\n    function schedule_delegator_bond_less(address candidate, uint256 less)\n        external;\n\n    /// @dev Execute pending delegation request (if exists && is due)\n    /// Selector: e42366a6\n    /// @param delegator The address of the delegator\n    /// @param candidate The address of the candidate\n    function execute_delegation_request(address delegator, address candidate)\n        external;\n\n    /// @dev Cancel pending delegation request (already made in support of input by caller)\n    /// Selector: 7284cf50\n    /// @param candidate The address of the candidate\n    function cancel_delegation_request(address candidate) external;\n}"
+			}
+		},
+		"settings": {
+			"optimizer": {
+				"enabled": false,
+				"runs": 200
+			},
+			"outputSelection": {
+				"*": {
+					"": [
+						"ast"
+					],
+					"*": [
+						"abi",
+						"metadata",
+						"devdoc",
+						"userdoc",
+						"storageLayout",
+						"evm.legacyAssembly",
+						"evm.bytecode",
+						"evm.deployedBytecode",
+						"evm.methodIdentifiers",
+						"evm.gasEstimates",
+						"evm.assembly"
+					]
+				}
+			}
+		}
+	},
+	"output": {
+		"contracts": {
+			"StakingInterface.sol": {
+				"ParachainStaking": {
+					"abi": [
+						{
+							"inputs": [],
+							"name": "cancel_candidate_bond_less",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								}
+							],
+							"name": "cancel_delegation_request",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "candidateCount",
+									"type": "uint256"
+								}
+							],
+							"name": "cancel_leave_candidates",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "cancel_leave_delegators",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "less",
+									"type": "uint256"
+								}
+							],
+							"name": "candidate_bond_less",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "more",
+									"type": "uint256"
+								}
+							],
+							"name": "candidate_bond_more",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "candidate_count",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								}
+							],
+							"name": "candidate_delegation_count",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "collator",
+									"type": "address"
+								}
+							],
+							"name": "collator_nomination_count",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								},
+								{
+									"internalType": "uint256",
+									"name": "candidateDelegationCount",
+									"type": "uint256"
+								},
+								{
+									"internalType": "uint256",
+									"name": "delegatorDelegationCount",
+									"type": "uint256"
+								}
+							],
+							"name": "delegate",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "more",
+									"type": "uint256"
+								}
+							],
+							"name": "delegator_bond_more",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "delegator",
+									"type": "address"
+								}
+							],
+							"name": "delegator_delegation_count",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								}
+							],
+							"name": "execute_candidate_bond_less",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "delegator",
+									"type": "address"
+								},
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								}
+							],
+							"name": "execute_delegation_request",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "candidateDelegationCount",
+									"type": "uint256"
+								}
+							],
+							"name": "execute_leave_candidates",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "delegator",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "delegatorDelegationCount",
+									"type": "uint256"
+								}
+							],
+							"name": "execute_leave_delegators",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "go_offline",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "go_online",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								}
+							],
+							"name": "is_candidate",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "delegator",
+									"type": "address"
+								}
+							],
+							"name": "is_delegator",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "nominator",
+									"type": "address"
+								}
+							],
+							"name": "is_nominator",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								}
+							],
+							"name": "is_selected_candidate",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								},
+								{
+									"internalType": "uint256",
+									"name": "candidateCount",
+									"type": "uint256"
+								}
+							],
+							"name": "join_candidates",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "candidateCount",
+									"type": "uint256"
+								}
+							],
+							"name": "leave_candidates",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "nominatorNominationCount",
+									"type": "uint256"
+								}
+							],
+							"name": "leave_nominators",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "min_delegation",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "min_nomination",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "collator",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								},
+								{
+									"internalType": "uint256",
+									"name": "collatorNominationCount",
+									"type": "uint256"
+								},
+								{
+									"internalType": "uint256",
+									"name": "nominatorNominationCount",
+									"type": "uint256"
+								}
+							],
+							"name": "nominate",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "less",
+									"type": "uint256"
+								}
+							],
+							"name": "nominator_bond_less",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "more",
+									"type": "uint256"
+								}
+							],
+							"name": "nominator_bond_more",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "nominator",
+									"type": "address"
+								}
+							],
+							"name": "nominator_nomination_count",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "round",
+									"type": "uint256"
+								}
+							],
+							"name": "points",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "collator",
+									"type": "address"
+								}
+							],
+							"name": "revoke_nomination",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "less",
+									"type": "uint256"
+								}
+							],
+							"name": "schedule_candidate_bond_less",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "less",
+									"type": "uint256"
+								}
+							],
+							"name": "schedule_delegator_bond_less",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "candidateCount",
+									"type": "uint256"
+								}
+							],
+							"name": "schedule_leave_candidates",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "schedule_leave_delegators",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "candidate",
+									"type": "address"
+								}
+							],
+							"name": "schedule_revoke_delegation",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "selected_candidates",
+							"outputs": [
+								{
+									"internalType": "address[]",
+									"name": "",
+									"type": "address[]"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						}
+					],
+					"devdoc": {
+						"author": "The Moonbeam Team",
+						"kind": "dev",
+						"methods": {
+							"cancel_candidate_bond_less()": {
+								"details": "Cancel pending candidate bond request Selector: 583d0fdc"
+							},
+							"cancel_delegation_request(address)": {
+								"details": "Cancel pending delegation request (already made in support of input by caller) Selector: 7284cf50",
+								"params": {
+									"candidate": "The address of the candidate"
+								}
+							},
+							"cancel_leave_candidates(uint256)": {
+								"details": "Cancel request to leave the set of collator candidates Selector: 0880b3e2",
+								"params": {
+									"candidateCount": "The number of candidates in the CandidatePool"
+								}
+							},
+							"cancel_leave_delegators()": {
+								"details": "Cancel request to leave the set of delegators Selector: 2a987643"
+							},
+							"candidate_bond_less(uint256)": {
+								"details": "Request to bond less for collator candidates Selector: 289b6ba7",
+								"params": {
+									"less": "The amount to be subtracted from self-bond and unreserved"
+								}
+							},
+							"candidate_bond_more(uint256)": {
+								"details": "Request to bond more for collator candidates Selector: c57bd3a8",
+								"params": {
+									"more": "The additional amount self-bonded"
+								}
+							},
+							"candidate_count()": {
+								"details": "Get the CandidateCount weight hint Selector: 4b1c4c29",
+								"returns": {
+									"_0": "The CandidateCount weight hint"
+								}
+							},
+							"candidate_delegation_count(address)": {
+								"details": "Get the CandidateDelegationCount weight hint Selector: 815b796c",
+								"params": {
+									"candidate": "The address for which we are querying the nomination count"
+								},
+								"returns": {
+									"_0": "The number of nominations backing the collator"
+								}
+							},
+							"collator_nomination_count(address)": {
+								"details": "Get the CollatorNominationCount weight hint Selector: 0ad6a7be",
+								"params": {
+									"collator": "The address for which we are querying the nomination count"
+								},
+								"returns": {
+									"_0": "The number of nominations backing the collator"
+								}
+							},
+							"delegate(address,uint256,uint256,uint256)": {
+								"details": "Make a delegation in support of a collator candidate Selector: 829f5ee3",
+								"params": {
+									"amount": "The amount bonded in support of the collator candidate",
+									"candidate": "The address of the supported collator candidate",
+									"candidateDelegationCount": "The number of delegations in support of the candidate",
+									"delegatorDelegationCount": "The number of existing delegations by the caller"
+								}
+							},
+							"delegator_bond_more(address,uint256)": {
+								"details": "Bond more for delegators with respect to a specific collator candidate Selector: f8331108",
+								"params": {
+									"candidate": "The address of the collator candidate for which delegation shall increase",
+									"more": "The amount by which the delegation is increased"
+								}
+							},
+							"delegator_delegation_count(address)": {
+								"details": "Get the DelegatorDelegationCount weight hint Selector: fbc51bca",
+								"params": {
+									"delegator": "The address for which we are querying the delegation count"
+								},
+								"returns": {
+									"_0": "The number of delegations made by the delegator"
+								}
+							},
+							"execute_candidate_bond_less(address)": {
+								"details": "Execute pending candidate bond request Selector: a9a2b8b7",
+								"params": {
+									"candidate": "The address for the candidate for which the request will be executed"
+								}
+							},
+							"execute_delegation_request(address,address)": {
+								"details": "Execute pending delegation request (if exists && is due) Selector: e42366a6",
+								"params": {
+									"candidate": "The address of the candidate",
+									"delegator": "The address of the delegator"
+								}
+							},
+							"execute_leave_candidates(address,uint256)": {
+								"details": "Execute due request to leave the set of collator candidates Selector: 3fdc4c30",
+								"params": {
+									"candidate": "The candidate address for which the pending exit request will be executed",
+									"candidateDelegationCount": "The number of delegations for the candidate to be revoked"
+								}
+							},
+							"execute_leave_delegators(address,uint256)": {
+								"details": "Execute request to leave the set of delegators and revoke all delegations Selector: a84a7468",
+								"params": {
+									"delegator": "The leaving delegator",
+									"delegatorDelegationCount": "The number of active delegations to be revoked by delegator"
+								}
+							},
+							"go_offline()": {
+								"details": "Temporarily leave the set of collator candidates without unbonding Selector: 767e0450"
+							},
+							"go_online()": {
+								"details": "Rejoin the set of collator candidates if previously had called `go_offline` Selector: d2f73ceb"
+							},
+							"is_candidate(address)": {
+								"details": "Check whether the specified address is currently a collator candidate Selector: 8545c833",
+								"params": {
+									"candidate": "the address that we want to confirm is a collator andidate"
+								},
+								"returns": {
+									"_0": "A boolean confirming whether the address is a collator candidate"
+								}
+							},
+							"is_delegator(address)": {
+								"details": "Check whether the specified address is currently a staking delegator Selector: 1f030587",
+								"params": {
+									"delegator": "the address that we want to confirm is a delegator"
+								},
+								"returns": {
+									"_0": "A boolean confirming whether the address is a delegator"
+								}
+							},
+							"is_nominator(address)": {
+								"details": "Check whether the specified address is currently a staking nominator Selector: 8e5080e7",
+								"params": {
+									"nominator": "the address that we want to confirm is a nominator"
+								},
+								"returns": {
+									"_0": "A boolean confirming whether the address is a nominator"
+								}
+							},
+							"is_selected_candidate(address)": {
+								"details": "Check whether the specifies address is currently a part of the active set Selector: 8f6d27c7",
+								"params": {
+									"candidate": "the address that we want to confirm is a part of the active set"
+								},
+								"returns": {
+									"_0": "A boolean confirming whether the address is a part of the active set"
+								}
+							},
+							"join_candidates(uint256,uint256)": {
+								"details": "Join the set of collator candidates Selector: 0a1bff60",
+								"params": {
+									"amount": "The amount self-bonded by the caller to become a collator candidate",
+									"candidateCount": "The number of candidates in the CandidatePool"
+								}
+							},
+							"leave_candidates(uint256)": {
+								"details": "Leave the set of collator candidates Selector: 72b02a31",
+								"params": {
+									"candidateCount": "The number of candidates in the CandidatePool"
+								}
+							},
+							"leave_nominators(uint256)": {
+								"details": "Request to leave the set of nominators Selector: b71d2153",
+								"params": {
+									"nominatorNominationCount": "The number of active nominations to be revoked by caller"
+								}
+							},
+							"min_delegation()": {
+								"details": "Get the minimum delegation amount Selector: 72ce8933",
+								"returns": {
+									"_0": "The minimum delegation amount"
+								}
+							},
+							"min_nomination()": {
+								"details": "Get the minimum nomination amount Selector: c9f593b2",
+								"returns": {
+									"_0": "The minimum nomination amount"
+								}
+							},
+							"nominate(address,uint256,uint256,uint256)": {
+								"details": "Make a nomination in support of a collator candidate Selector: 49df6eb3",
+								"params": {
+									"amount": "The amount bonded in support of the collator candidate",
+									"collator": "The address of the supported collator candidate",
+									"collatorNominationCount": "The number of nominations in support of the candidate",
+									"nominatorNominationCount": "The number of existing nominations by the caller"
+								}
+							},
+							"nominator_bond_less(address,uint256)": {
+								"details": "Request to bond less for nominators with respect to a specific collator candidate Selector: f6a52569",
+								"params": {
+									"candidate": "The address of the collator candidate for which nomination is decreased",
+									"less": "The amount by which the nomination is decreased"
+								}
+							},
+							"nominator_bond_more(address,uint256)": {
+								"details": "Request to bond more for nominators with respect to a specific collator candidate Selector: 971d44c8",
+								"params": {
+									"candidate": "The address of the collator candidate for which nomination is increased",
+									"more": "The amount by which the nomination is increased"
+								}
+							},
+							"nominator_nomination_count(address)": {
+								"details": "Get the NominatorNominationCount weight hint Selector: dae5659b",
+								"params": {
+									"nominator": "The address for which we are querying the nomination count"
+								},
+								"returns": {
+									"_0": "The number of nominations made by the nominator"
+								}
+							},
+							"points(uint256)": {
+								"details": "Total points awarded to all collators in a particular round Selector: 9799b4e7",
+								"params": {
+									"round": "the round for which we are querying the points total"
+								},
+								"returns": {
+									"_0": "The total points awarded to all collators in the round"
+								}
+							},
+							"revoke_nomination(address)": {
+								"details": "Request to revoke an existing nomination Selector: 4b65c34b",
+								"params": {
+									"collator": "The address of the collator candidate which will no longer be supported"
+								}
+							},
+							"schedule_candidate_bond_less(uint256)": {
+								"details": "Request to bond less for collator candidates Selector: 034c47bc",
+								"params": {
+									"less": "The amount to be subtracted from self-bond and unreserved"
+								}
+							},
+							"schedule_delegator_bond_less(address,uint256)": {
+								"details": "Request to bond less for delegators with respect to a specific collator candidate Selector: 00043acf",
+								"params": {
+									"candidate": "The address of the collator candidate for which delegation shall decrease",
+									"less": "The amount by which the delegation is decreased (upon execution)"
+								}
+							},
+							"schedule_leave_candidates(uint256)": {
+								"details": "Request to leave the set of collator candidates Selector: 60afbac6",
+								"params": {
+									"candidateCount": "The number of candidates in the CandidatePool"
+								}
+							},
+							"schedule_leave_delegators()": {
+								"details": "Request to leave the set of delegators Selector: 65a5bbd0"
+							},
+							"schedule_revoke_delegation(address)": {
+								"details": "Request to revoke an existing delegation Selector: 22266e75",
+								"params": {
+									"candidate": "The address of the collator candidate which will no longer be supported"
+								}
+							},
+							"selected_candidates()": {
+								"details": "Get the selected candidates for the current round Selector: 0x89f47a21",
+								"returns": {
+									"_0": "The selected candidate accounts"
+								}
+							}
+						},
+						"title": "The interface through which solidity contracts will interact with Parachain Staking We follow this same interface including four-byte function selectors, in the precompile that wraps the pallet Address :    0x0000000000000000000000000000000000000800",
+						"version": 1
+					},
+					"evm": {
+						"assembly": "",
+						"bytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"deployedBytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"immutableReferences": {},
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"gasEstimates": null,
+						"legacyAssembly": null,
+						"methodIdentifiers": {
+							"cancel_candidate_bond_less()": "583d0fdc",
+							"cancel_delegation_request(address)": "7284cf50",
+							"cancel_leave_candidates(uint256)": "0880b3e2",
+							"cancel_leave_delegators()": "2a987643",
+							"candidate_bond_less(uint256)": "289b6ba7",
+							"candidate_bond_more(uint256)": "c57bd3a8",
+							"candidate_count()": "4b1c4c29",
+							"candidate_delegation_count(address)": "815b796c",
+							"collator_nomination_count(address)": "0ad6a7be",
+							"delegate(address,uint256,uint256,uint256)": "829f5ee3",
+							"delegator_bond_more(address,uint256)": "f8331108",
+							"delegator_delegation_count(address)": "fbc51bca",
+							"execute_candidate_bond_less(address)": "a9a2b8b7",
+							"execute_delegation_request(address,address)": "e42366a6",
+							"execute_leave_candidates(address,uint256)": "3fdc4c30",
+							"execute_leave_delegators(address,uint256)": "a84a7468",
+							"go_offline()": "767e0450",
+							"go_online()": "d2f73ceb",
+							"is_candidate(address)": "8545c833",
+							"is_delegator(address)": "1f030587",
+							"is_nominator(address)": "8e5080e7",
+							"is_selected_candidate(address)": "8f6d27c7",
+							"join_candidates(uint256,uint256)": "0a1bff60",
+							"leave_candidates(uint256)": "72b02a31",
+							"leave_nominators(uint256)": "b71d2153",
+							"min_delegation()": "72ce8933",
+							"min_nomination()": "c9f593b2",
+							"nominate(address,uint256,uint256,uint256)": "49df6eb3",
+							"nominator_bond_less(address,uint256)": "f6a52569",
+							"nominator_bond_more(address,uint256)": "971d44c8",
+							"nominator_nomination_count(address)": "dae5659b",
+							"points(uint256)": "9799b4e7",
+							"revoke_nomination(address)": "4b65c34b",
+							"schedule_candidate_bond_less(uint256)": "034c47bc",
+							"schedule_delegator_bond_less(address,uint256)": "00043acf",
+							"schedule_leave_candidates(uint256)": "60afbac6",
+							"schedule_leave_delegators()": "65a5bbd0",
+							"schedule_revoke_delegation(address)": "22266e75",
+							"selected_candidates()": "89f47a21"
+						}
+					},
+					"metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"cancel_candidate_bond_less\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"}],\"name\":\"cancel_delegation_request\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"candidateCount\",\"type\":\"uint256\"}],\"name\":\"cancel_leave_candidates\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cancel_leave_delegators\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"less\",\"type\":\"uint256\"}],\"name\":\"candidate_bond_less\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"more\",\"type\":\"uint256\"}],\"name\":\"candidate_bond_more\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"candidate_count\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"}],\"name\":\"candidate_delegation_count\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collator\",\"type\":\"address\"}],\"name\":\"collator_nomination_count\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"candidateDelegationCount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"delegatorDelegationCount\",\"type\":\"uint256\"}],\"name\":\"delegate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"more\",\"type\":\"uint256\"}],\"name\":\"delegator_bond_more\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"delegator\",\"type\":\"address\"}],\"name\":\"delegator_delegation_count\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"}],\"name\":\"execute_candidate_bond_less\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"delegator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"}],\"name\":\"execute_delegation_request\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"candidateDelegationCount\",\"type\":\"uint256\"}],\"name\":\"execute_leave_candidates\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"delegator\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"delegatorDelegationCount\",\"type\":\"uint256\"}],\"name\":\"execute_leave_delegators\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"go_offline\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"go_online\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"}],\"name\":\"is_candidate\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"delegator\",\"type\":\"address\"}],\"name\":\"is_delegator\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"nominator\",\"type\":\"address\"}],\"name\":\"is_nominator\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"}],\"name\":\"is_selected_candidate\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"candidateCount\",\"type\":\"uint256\"}],\"name\":\"join_candidates\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"candidateCount\",\"type\":\"uint256\"}],\"name\":\"leave_candidates\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"nominatorNominationCount\",\"type\":\"uint256\"}],\"name\":\"leave_nominators\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"min_delegation\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"min_nomination\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collator\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"collatorNominationCount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nominatorNominationCount\",\"type\":\"uint256\"}],\"name\":\"nominate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"less\",\"type\":\"uint256\"}],\"name\":\"nominator_bond_less\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"more\",\"type\":\"uint256\"}],\"name\":\"nominator_bond_more\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"nominator\",\"type\":\"address\"}],\"name\":\"nominator_nomination_count\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"round\",\"type\":\"uint256\"}],\"name\":\"points\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collator\",\"type\":\"address\"}],\"name\":\"revoke_nomination\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"less\",\"type\":\"uint256\"}],\"name\":\"schedule_candidate_bond_less\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"less\",\"type\":\"uint256\"}],\"name\":\"schedule_delegator_bond_less\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"candidateCount\",\"type\":\"uint256\"}],\"name\":\"schedule_leave_candidates\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"schedule_leave_delegators\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"candidate\",\"type\":\"address\"}],\"name\":\"schedule_revoke_delegation\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"selected_candidates\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"The Moonbeam Team\",\"kind\":\"dev\",\"methods\":{\"cancel_candidate_bond_less()\":{\"details\":\"Cancel pending candidate bond request Selector: 583d0fdc\"},\"cancel_delegation_request(address)\":{\"details\":\"Cancel pending delegation request (already made in support of input by caller) Selector: 7284cf50\",\"params\":{\"candidate\":\"The address of the candidate\"}},\"cancel_leave_candidates(uint256)\":{\"details\":\"Cancel request to leave the set of collator candidates Selector: 0880b3e2\",\"params\":{\"candidateCount\":\"The number of candidates in the CandidatePool\"}},\"cancel_leave_delegators()\":{\"details\":\"Cancel request to leave the set of delegators Selector: 2a987643\"},\"candidate_bond_less(uint256)\":{\"details\":\"Request to bond less for collator candidates Selector: 289b6ba7\",\"params\":{\"less\":\"The amount to be subtracted from self-bond and unreserved\"}},\"candidate_bond_more(uint256)\":{\"details\":\"Request to bond more for collator candidates Selector: c57bd3a8\",\"params\":{\"more\":\"The additional amount self-bonded\"}},\"candidate_count()\":{\"details\":\"Get the CandidateCount weight hint Selector: 4b1c4c29\",\"returns\":{\"_0\":\"The CandidateCount weight hint\"}},\"candidate_delegation_count(address)\":{\"details\":\"Get the CandidateDelegationCount weight hint Selector: 815b796c\",\"params\":{\"candidate\":\"The address for which we are querying the nomination count\"},\"returns\":{\"_0\":\"The number of nominations backing the collator\"}},\"collator_nomination_count(address)\":{\"details\":\"Get the CollatorNominationCount weight hint Selector: 0ad6a7be\",\"params\":{\"collator\":\"The address for which we are querying the nomination count\"},\"returns\":{\"_0\":\"The number of nominations backing the collator\"}},\"delegate(address,uint256,uint256,uint256)\":{\"details\":\"Make a delegation in support of a collator candidate Selector: 829f5ee3\",\"params\":{\"amount\":\"The amount bonded in support of the collator candidate\",\"candidate\":\"The address of the supported collator candidate\",\"candidateDelegationCount\":\"The number of delegations in support of the candidate\",\"delegatorDelegationCount\":\"The number of existing delegations by the caller\"}},\"delegator_bond_more(address,uint256)\":{\"details\":\"Bond more for delegators with respect to a specific collator candidate Selector: f8331108\",\"params\":{\"candidate\":\"The address of the collator candidate for which delegation shall increase\",\"more\":\"The amount by which the delegation is increased\"}},\"delegator_delegation_count(address)\":{\"details\":\"Get the DelegatorDelegationCount weight hint Selector: fbc51bca\",\"params\":{\"delegator\":\"The address for which we are querying the delegation count\"},\"returns\":{\"_0\":\"The number of delegations made by the delegator\"}},\"execute_candidate_bond_less(address)\":{\"details\":\"Execute pending candidate bond request Selector: a9a2b8b7\",\"params\":{\"candidate\":\"The address for the candidate for which the request will be executed\"}},\"execute_delegation_request(address,address)\":{\"details\":\"Execute pending delegation request (if exists && is due) Selector: e42366a6\",\"params\":{\"candidate\":\"The address of the candidate\",\"delegator\":\"The address of the delegator\"}},\"execute_leave_candidates(address,uint256)\":{\"details\":\"Execute due request to leave the set of collator candidates Selector: 3fdc4c30\",\"params\":{\"candidate\":\"The candidate address for which the pending exit request will be executed\",\"candidateDelegationCount\":\"The number of delegations for the candidate to be revoked\"}},\"execute_leave_delegators(address,uint256)\":{\"details\":\"Execute request to leave the set of delegators and revoke all delegations Selector: a84a7468\",\"params\":{\"delegator\":\"The leaving delegator\",\"delegatorDelegationCount\":\"The number of active delegations to be revoked by delegator\"}},\"go_offline()\":{\"details\":\"Temporarily leave the set of collator candidates without unbonding Selector: 767e0450\"},\"go_online()\":{\"details\":\"Rejoin the set of collator candidates if previously had called `go_offline` Selector: d2f73ceb\"},\"is_candidate(address)\":{\"details\":\"Check whether the specified address is currently a collator candidate Selector: 8545c833\",\"params\":{\"candidate\":\"the address that we want to confirm is a collator andidate\"},\"returns\":{\"_0\":\"A boolean confirming whether the address is a collator candidate\"}},\"is_delegator(address)\":{\"details\":\"Check whether the specified address is currently a staking delegator Selector: 1f030587\",\"params\":{\"delegator\":\"the address that we want to confirm is a delegator\"},\"returns\":{\"_0\":\"A boolean confirming whether the address is a delegator\"}},\"is_nominator(address)\":{\"details\":\"Check whether the specified address is currently a staking nominator Selector: 8e5080e7\",\"params\":{\"nominator\":\"the address that we want to confirm is a nominator\"},\"returns\":{\"_0\":\"A boolean confirming whether the address is a nominator\"}},\"is_selected_candidate(address)\":{\"details\":\"Check whether the specifies address is currently a part of the active set Selector: 8f6d27c7\",\"params\":{\"candidate\":\"the address that we want to confirm is a part of the active set\"},\"returns\":{\"_0\":\"A boolean confirming whether the address is a part of the active set\"}},\"join_candidates(uint256,uint256)\":{\"details\":\"Join the set of collator candidates Selector: 0a1bff60\",\"params\":{\"amount\":\"The amount self-bonded by the caller to become a collator candidate\",\"candidateCount\":\"The number of candidates in the CandidatePool\"}},\"leave_candidates(uint256)\":{\"details\":\"Leave the set of collator candidates Selector: 72b02a31\",\"params\":{\"candidateCount\":\"The number of candidates in the CandidatePool\"}},\"leave_nominators(uint256)\":{\"details\":\"Request to leave the set of nominators Selector: b71d2153\",\"params\":{\"nominatorNominationCount\":\"The number of active nominations to be revoked by caller\"}},\"min_delegation()\":{\"details\":\"Get the minimum delegation amount Selector: 72ce8933\",\"returns\":{\"_0\":\"The minimum delegation amount\"}},\"min_nomination()\":{\"details\":\"Get the minimum nomination amount Selector: c9f593b2\",\"returns\":{\"_0\":\"The minimum nomination amount\"}},\"nominate(address,uint256,uint256,uint256)\":{\"details\":\"Make a nomination in support of a collator candidate Selector: 49df6eb3\",\"params\":{\"amount\":\"The amount bonded in support of the collator candidate\",\"collator\":\"The address of the supported collator candidate\",\"collatorNominationCount\":\"The number of nominations in support of the candidate\",\"nominatorNominationCount\":\"The number of existing nominations by the caller\"}},\"nominator_bond_less(address,uint256)\":{\"details\":\"Request to bond less for nominators with respect to a specific collator candidate Selector: f6a52569\",\"params\":{\"candidate\":\"The address of the collator candidate for which nomination is decreased\",\"less\":\"The amount by which the nomination is decreased\"}},\"nominator_bond_more(address,uint256)\":{\"details\":\"Request to bond more for nominators with respect to a specific collator candidate Selector: 971d44c8\",\"params\":{\"candidate\":\"The address of the collator candidate for which nomination is increased\",\"more\":\"The amount by which the nomination is increased\"}},\"nominator_nomination_count(address)\":{\"details\":\"Get the NominatorNominationCount weight hint Selector: dae5659b\",\"params\":{\"nominator\":\"The address for which we are querying the nomination count\"},\"returns\":{\"_0\":\"The number of nominations made by the nominator\"}},\"points(uint256)\":{\"details\":\"Total points awarded to all collators in a particular round Selector: 9799b4e7\",\"params\":{\"round\":\"the round for which we are querying the points total\"},\"returns\":{\"_0\":\"The total points awarded to all collators in the round\"}},\"revoke_nomination(address)\":{\"details\":\"Request to revoke an existing nomination Selector: 4b65c34b\",\"params\":{\"collator\":\"The address of the collator candidate which will no longer be supported\"}},\"schedule_candidate_bond_less(uint256)\":{\"details\":\"Request to bond less for collator candidates Selector: 034c47bc\",\"params\":{\"less\":\"The amount to be subtracted from self-bond and unreserved\"}},\"schedule_delegator_bond_less(address,uint256)\":{\"details\":\"Request to bond less for delegators with respect to a specific collator candidate Selector: 00043acf\",\"params\":{\"candidate\":\"The address of the collator candidate for which delegation shall decrease\",\"less\":\"The amount by which the delegation is decreased (upon execution)\"}},\"schedule_leave_candidates(uint256)\":{\"details\":\"Request to leave the set of collator candidates Selector: 60afbac6\",\"params\":{\"candidateCount\":\"The number of candidates in the CandidatePool\"}},\"schedule_leave_delegators()\":{\"details\":\"Request to leave the set of delegators Selector: 65a5bbd0\"},\"schedule_revoke_delegation(address)\":{\"details\":\"Request to revoke an existing delegation Selector: 22266e75\",\"params\":{\"candidate\":\"The address of the collator candidate which will no longer be supported\"}},\"selected_candidates()\":{\"details\":\"Get the selected candidates for the current round Selector: 0x89f47a21\",\"returns\":{\"_0\":\"The selected candidate accounts\"}}},\"title\":\"The interface through which solidity contracts will interact with Parachain Staking We follow this same interface including four-byte function selectors, in the precompile that wraps the pallet Address :    0x0000000000000000000000000000000000000800\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"candidate_bond_less(uint256)\":{\"notice\":\"DEPRECATED, replaced by schedule_candidate_bond_less, execute_candidate_bond_request, cancel_candidate_bond_request\"},\"collator_nomination_count(address)\":{\"notice\":\"DEPRECATED, replaced by candidate_delegation_count\"},\"is_nominator(address)\":{\"notice\":\"DEPRECATED, replaced by is_delegator\"},\"leave_candidates(uint256)\":{\"notice\":\"DEPRECATED, replaced by schedule_leave_candidates, execute_leave_candidates, cancel_leave_candidates\"},\"leave_nominators(uint256)\":{\"notice\":\"DEPRECATED, replaced by schedule_leave_delegators, execute_leave_delegators, cancel_leave_delegators\"},\"min_nomination()\":{\"notice\":\"DEPRECATED, replaced by min_delegation\"},\"nominate(address,uint256,uint256,uint256)\":{\"notice\":\"DEPRECATED, replaced by delegate\"},\"nominator_bond_less(address,uint256)\":{\"notice\":\"DEPRECATED, replaced by schedule_delegator_bond_less, execute_delegation_request, cancel_delegation_request\"},\"nominator_bond_more(address,uint256)\":{\"notice\":\"DEPRECATED, replaced by delegator_bond_more\"},\"nominator_nomination_count(address)\":{\"notice\":\"DEPRECATED, replaced by delegator_delegation_count\"},\"revoke_nomination(address)\":{\"notice\":\"DEPRECATED, replaced by schedule_revoke_delegation, execute_delegation_request, cancel_delegation_request\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"StakingInterface.sol\":\"ParachainStaking\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"StakingInterface.sol\":{\"keccak256\":\"0x3db0e95ef9910e7d86f3cdb04dd2c38c40c3a556088b7b16c9f7d0c9ad8815bc\",\"license\":\"GPL-3.0-only\",\"urls\":[\"bzz-raw://268765d8ae4e575e6a43de429db405ab6ad4e7a5d0a123a603ed66b5bc5cd713\",\"dweb:/ipfs/QmYFyieAgvQHuqKhet9ue8FnzWyvdBbGWvu6X8A253QJiA\"]}},\"version\":1}",
+					"storageLayout": {
+						"storage": [],
+						"types": null
+					},
+					"userdoc": {
+						"kind": "user",
+						"methods": {
+							"candidate_bond_less(uint256)": {
+								"notice": "DEPRECATED, replaced by schedule_candidate_bond_less, execute_candidate_bond_request, cancel_candidate_bond_request"
+							},
+							"collator_nomination_count(address)": {
+								"notice": "DEPRECATED, replaced by candidate_delegation_count"
+							},
+							"is_nominator(address)": {
+								"notice": "DEPRECATED, replaced by is_delegator"
+							},
+							"leave_candidates(uint256)": {
+								"notice": "DEPRECATED, replaced by schedule_leave_candidates, execute_leave_candidates, cancel_leave_candidates"
+							},
+							"leave_nominators(uint256)": {
+								"notice": "DEPRECATED, replaced by schedule_leave_delegators, execute_leave_delegators, cancel_leave_delegators"
+							},
+							"min_nomination()": {
+								"notice": "DEPRECATED, replaced by min_delegation"
+							},
+							"nominate(address,uint256,uint256,uint256)": {
+								"notice": "DEPRECATED, replaced by delegate"
+							},
+							"nominator_bond_less(address,uint256)": {
+								"notice": "DEPRECATED, replaced by schedule_delegator_bond_less, execute_delegation_request, cancel_delegation_request"
+							},
+							"nominator_bond_more(address,uint256)": {
+								"notice": "DEPRECATED, replaced by delegator_bond_more"
+							},
+							"nominator_nomination_count(address)": {
+								"notice": "DEPRECATED, replaced by delegator_delegation_count"
+							},
+							"revoke_nomination(address)": {
+								"notice": "DEPRECATED, replaced by schedule_revoke_delegation, execute_delegation_request, cancel_delegation_request"
+							}
+						},
+						"version": 1
+					}
+				}
+			}
+		},
+		"sources": {
+			"StakingInterface.sol": {
+				"ast": {
+					"absolutePath": "StakingInterface.sol",
+					"exportedSymbols": {
+						"ParachainStaking": [
+							274
+						]
+					},
+					"id": 275,
+					"license": "GPL-3.0-only",
+					"nodeType": "SourceUnit",
+					"nodes": [
+						{
+							"id": 1,
+							"literals": [
+								"solidity",
+								">=",
+								"0.8",
+								".0"
+							],
+							"nodeType": "PragmaDirective",
+							"src": "41:24:0"
+						},
+						{
+							"abstract": false,
+							"baseContracts": [],
+							"contractDependencies": [],
+							"contractKind": "interface",
+							"documentation": {
+								"id": 2,
+								"nodeType": "StructuredDocumentation",
+								"src": "67:305:0",
+								"text": " @author The Moonbeam Team\n @title The interface through which solidity contracts will interact with Parachain Staking\n We follow this same interface including four-byte function selectors, in the precompile that\n wraps the pallet\n Address :    0x0000000000000000000000000000000000000800"
+							},
+							"fullyImplemented": false,
+							"id": 274,
+							"linearizedBaseContracts": [
+								274
+							],
+							"name": "ParachainStaking",
+							"nameLocation": "384:16:0",
+							"nodeType": "ContractDefinition",
+							"nodes": [
+								{
+									"documentation": {
+										"id": 3,
+										"nodeType": "StructuredDocumentation",
+										"src": "407:297:0",
+										"text": "DEPRECATED, replaced by is_delegator\n @dev Check whether the specified address is currently a staking nominator\n Selector: 8e5080e7\n @param nominator the address that we want to confirm is a nominator\n @return A boolean confirming whether the address is a nominator"
+									},
+									"functionSelector": "8e5080e7",
+									"id": 10,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "is_nominator",
+									"nameLocation": "718:12:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 6,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 5,
+												"mutability": "mutable",
+												"name": "nominator",
+												"nameLocation": "739:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 10,
+												"src": "731:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 4,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "731:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "730:19:0"
+									},
+									"returnParameters": {
+										"id": 9,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 8,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 10,
+												"src": "773:4:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 7,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "773:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "772:6:0"
+									},
+									"scope": 274,
+									"src": "709:70:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 11,
+										"nodeType": "StructuredDocumentation",
+										"src": "785:252:0",
+										"text": "@dev Check whether the specified address is currently a staking delegator\n Selector: 1f030587\n @param delegator the address that we want to confirm is a delegator\n @return A boolean confirming whether the address is a delegator"
+									},
+									"functionSelector": "1f030587",
+									"id": 18,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "is_delegator",
+									"nameLocation": "1051:12:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 14,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 13,
+												"mutability": "mutable",
+												"name": "delegator",
+												"nameLocation": "1072:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 18,
+												"src": "1064:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 12,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1064:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1063:19:0"
+									},
+									"returnParameters": {
+										"id": 17,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 16,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 18,
+												"src": "1106:4:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 15,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "1106:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1105:6:0"
+									},
+									"scope": 274,
+									"src": "1042:70:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 19,
+										"nodeType": "StructuredDocumentation",
+										"src": "1118:270:0",
+										"text": "@dev Check whether the specified address is currently a collator candidate\n Selector: 8545c833\n @param candidate the address that we want to confirm is a collator andidate\n @return A boolean confirming whether the address is a collator candidate"
+									},
+									"functionSelector": "8545c833",
+									"id": 26,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "is_candidate",
+									"nameLocation": "1402:12:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 22,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 21,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "1423:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 26,
+												"src": "1415:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 20,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1415:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1414:19:0"
+									},
+									"returnParameters": {
+										"id": 25,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 24,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 26,
+												"src": "1457:4:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 23,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "1457:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1456:6:0"
+									},
+									"scope": 274,
+									"src": "1393:70:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 27,
+										"nodeType": "StructuredDocumentation",
+										"src": "1469:283:0",
+										"text": "@dev Check whether the specifies address is currently a part of the active set\n Selector: 8f6d27c7\n @param candidate the address that we want to confirm is a part of the active set\n @return A boolean confirming whether the address is a part of the active set"
+									},
+									"functionSelector": "8f6d27c7",
+									"id": 34,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "is_selected_candidate",
+									"nameLocation": "1766:21:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 30,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 29,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "1796:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 34,
+												"src": "1788:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 28,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1788:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1787:19:0"
+									},
+									"returnParameters": {
+										"id": 33,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 32,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 34,
+												"src": "1854:4:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 31,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "1854:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1853:6:0"
+									},
+									"scope": 274,
+									"src": "1757:103:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 35,
+										"nodeType": "StructuredDocumentation",
+										"src": "1866:240:0",
+										"text": "@dev Total points awarded to all collators in a particular round\n Selector: 9799b4e7\n @param round the round for which we are querying the points total\n @return The total points awarded to all collators in the round"
+									},
+									"functionSelector": "9799b4e7",
+									"id": 42,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "points",
+									"nameLocation": "2120:6:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 38,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 37,
+												"mutability": "mutable",
+												"name": "round",
+												"nameLocation": "2135:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 42,
+												"src": "2127:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 36,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2127:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2126:15:0"
+									},
+									"returnParameters": {
+										"id": 41,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 40,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 42,
+												"src": "2165:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 39,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2165:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2164:9:0"
+									},
+									"scope": 274,
+									"src": "2111:63:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 43,
+										"nodeType": "StructuredDocumentation",
+										"src": "2180:162:0",
+										"text": "DEPRECATED, replaced by min_delegation\n @dev Get the minimum nomination amount\n Selector: c9f593b2\n @return The minimum nomination amount"
+									},
+									"functionSelector": "c9f593b2",
+									"id": 48,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "min_nomination",
+									"nameLocation": "2356:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 44,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2370:2:0"
+									},
+									"returnParameters": {
+										"id": 47,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 46,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 48,
+												"src": "2396:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 45,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2396:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2395:9:0"
+									},
+									"scope": 274,
+									"src": "2347:58:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 49,
+										"nodeType": "StructuredDocumentation",
+										"src": "2411:115:0",
+										"text": "@dev Get the minimum delegation amount\n Selector: 72ce8933\n @return The minimum delegation amount"
+									},
+									"functionSelector": "72ce8933",
+									"id": 54,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "min_delegation",
+									"nameLocation": "2540:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 50,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2554:2:0"
+									},
+									"returnParameters": {
+										"id": 53,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 52,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 54,
+												"src": "2580:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 51,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2580:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2579:9:0"
+									},
+									"scope": 274,
+									"src": "2531:58:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 55,
+										"nodeType": "StructuredDocumentation",
+										"src": "2595:117:0",
+										"text": "@dev Get the CandidateCount weight hint\n Selector: 4b1c4c29\n @return The CandidateCount weight hint"
+									},
+									"functionSelector": "4b1c4c29",
+									"id": 60,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "candidate_count",
+									"nameLocation": "2726:15:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 56,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2741:2:0"
+									},
+									"returnParameters": {
+										"id": 59,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 58,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 60,
+												"src": "2767:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 57,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2767:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2766:9:0"
+									},
+									"scope": 274,
+									"src": "2717:59:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 61,
+										"nodeType": "StructuredDocumentation",
+										"src": "2782:284:0",
+										"text": "DEPRECATED, replaced by candidate_delegation_count\n @dev Get the CollatorNominationCount weight hint\n Selector: 0ad6a7be\n @param collator The address for which we are querying the nomination count\n @return The number of nominations backing the collator"
+									},
+									"functionSelector": "0ad6a7be",
+									"id": 68,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "collator_nomination_count",
+									"nameLocation": "3080:25:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 64,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 63,
+												"mutability": "mutable",
+												"name": "collator",
+												"nameLocation": "3114:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 68,
+												"src": "3106:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 62,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "3106:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3105:18:0"
+									},
+									"returnParameters": {
+										"id": 67,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 66,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 68,
+												"src": "3171:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 65,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3171:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3170:9:0"
+									},
+									"scope": 274,
+									"src": "3071:109:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 69,
+										"nodeType": "StructuredDocumentation",
+										"src": "3186:227:0",
+										"text": "@dev Get the CandidateDelegationCount weight hint\n Selector: 815b796c\n @param candidate The address for which we are querying the nomination count\n @return The number of nominations backing the collator"
+									},
+									"functionSelector": "815b796c",
+									"id": 76,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "candidate_delegation_count",
+									"nameLocation": "3427:26:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 72,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 71,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "3462:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 76,
+												"src": "3454:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 70,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "3454:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3453:19:0"
+									},
+									"returnParameters": {
+										"id": 75,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 74,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 76,
+												"src": "3520:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 73,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3520:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3519:9:0"
+									},
+									"scope": 274,
+									"src": "3418:111:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 77,
+										"nodeType": "StructuredDocumentation",
+										"src": "3535:287:0",
+										"text": "DEPRECATED, replaced by delegator_delegation_count\n @dev Get the NominatorNominationCount weight hint\n Selector: dae5659b\n @param nominator The address for which we are querying the nomination count\n @return The number of nominations made by the nominator"
+									},
+									"functionSelector": "dae5659b",
+									"id": 84,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "nominator_nomination_count",
+									"nameLocation": "3836:26:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 80,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 79,
+												"mutability": "mutable",
+												"name": "nominator",
+												"nameLocation": "3871:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 84,
+												"src": "3863:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 78,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "3863:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3862:19:0"
+									},
+									"returnParameters": {
+										"id": 83,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 82,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 84,
+												"src": "3929:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 81,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3929:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3928:9:0"
+									},
+									"scope": 274,
+									"src": "3827:111:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 85,
+										"nodeType": "StructuredDocumentation",
+										"src": "3944:228:0",
+										"text": "@dev Get the DelegatorDelegationCount weight hint\n Selector: fbc51bca\n @param delegator The address for which we are querying the delegation count\n @return The number of delegations made by the delegator"
+									},
+									"functionSelector": "fbc51bca",
+									"id": 92,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "delegator_delegation_count",
+									"nameLocation": "4186:26:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 88,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 87,
+												"mutability": "mutable",
+												"name": "delegator",
+												"nameLocation": "4221:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 92,
+												"src": "4213:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 86,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "4213:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4212:19:0"
+									},
+									"returnParameters": {
+										"id": 91,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 90,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 92,
+												"src": "4279:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 89,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "4279:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4278:9:0"
+									},
+									"scope": 274,
+									"src": "4177:111:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 93,
+										"nodeType": "StructuredDocumentation",
+										"src": "4294:135:0",
+										"text": "@dev Get the selected candidates for the current round\n Selector: 0x89f47a21\n @return The selected candidate accounts"
+									},
+									"functionSelector": "89f47a21",
+									"id": 99,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "selected_candidates",
+									"nameLocation": "4443:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 94,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "4462:2:0"
+									},
+									"returnParameters": {
+										"id": 98,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 97,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 99,
+												"src": "4488:16:0",
+												"stateVariable": false,
+												"storageLocation": "memory",
+												"typeDescriptions": {
+													"typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
+													"typeString": "address[]"
+												},
+												"typeName": {
+													"baseType": {
+														"id": 95,
+														"name": "address",
+														"nodeType": "ElementaryTypeName",
+														"src": "4488:7:0",
+														"stateMutability": "nonpayable",
+														"typeDescriptions": {
+															"typeIdentifier": "t_address",
+															"typeString": "address"
+														}
+													},
+													"id": 96,
+													"nodeType": "ArrayTypeName",
+													"src": "4488:9:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+														"typeString": "address[]"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4487:18:0"
+									},
+									"scope": 274,
+									"src": "4434:72:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 100,
+										"nodeType": "StructuredDocumentation",
+										"src": "4512:237:0",
+										"text": "@dev Join the set of collator candidates\n Selector: 0a1bff60\n @param amount The amount self-bonded by the caller to become a collator candidate\n @param candidateCount The number of candidates in the CandidatePool"
+									},
+									"functionSelector": "0a1bff60",
+									"id": 107,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "join_candidates",
+									"nameLocation": "4763:15:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 105,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 102,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "4787:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 107,
+												"src": "4779:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 101,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "4779:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 104,
+												"mutability": "mutable",
+												"name": "candidateCount",
+												"nameLocation": "4803:14:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 107,
+												"src": "4795:22:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 103,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "4795:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4778:40:0"
+									},
+									"returnParameters": {
+										"id": 106,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "4827:0:0"
+									},
+									"scope": 274,
+									"src": "4754:74:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 108,
+										"nodeType": "StructuredDocumentation",
+										"src": "4834:265:0",
+										"text": "DEPRECATED, replaced by schedule_leave_candidates, execute_leave_candidates,\n cancel_leave_candidates\n @dev Leave the set of collator candidates\n Selector: 72b02a31\n @param candidateCount The number of candidates in the CandidatePool"
+									},
+									"functionSelector": "72b02a31",
+									"id": 113,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "leave_candidates",
+									"nameLocation": "5113:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 111,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 110,
+												"mutability": "mutable",
+												"name": "candidateCount",
+												"nameLocation": "5138:14:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 113,
+												"src": "5130:22:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 109,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "5130:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5129:24:0"
+									},
+									"returnParameters": {
+										"id": 112,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "5162:0:0"
+									},
+									"scope": 274,
+									"src": "5104:59:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 114,
+										"nodeType": "StructuredDocumentation",
+										"src": "5169:159:0",
+										"text": "@dev Request to leave the set of collator candidates\n Selector: 60afbac6\n @param candidateCount The number of candidates in the CandidatePool"
+									},
+									"functionSelector": "60afbac6",
+									"id": 119,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "schedule_leave_candidates",
+									"nameLocation": "5342:25:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 117,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 116,
+												"mutability": "mutable",
+												"name": "candidateCount",
+												"nameLocation": "5376:14:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 119,
+												"src": "5368:22:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 115,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "5368:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5367:24:0"
+									},
+									"returnParameters": {
+										"id": 118,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "5400:0:0"
+									},
+									"scope": 274,
+									"src": "5333:68:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 120,
+										"nodeType": "StructuredDocumentation",
+										"src": "5407:292:0",
+										"text": "@dev Execute due request to leave the set of collator candidates\n Selector: 3fdc4c30\n @param candidate The candidate address for which the pending exit request will be executed\n @param candidateDelegationCount The number of delegations for the candidate to be revoked"
+									},
+									"functionSelector": "3fdc4c30",
+									"id": 127,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "execute_leave_candidates",
+									"nameLocation": "5713:24:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 125,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 122,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "5755:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 127,
+												"src": "5747:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 121,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "5747:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 124,
+												"mutability": "mutable",
+												"name": "candidateDelegationCount",
+												"nameLocation": "5782:24:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 127,
+												"src": "5774:32:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 123,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "5774:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5737:75:0"
+									},
+									"returnParameters": {
+										"id": 126,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "5821:0:0"
+									},
+									"scope": 274,
+									"src": "5704:118:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 128,
+										"nodeType": "StructuredDocumentation",
+										"src": "5828:166:0",
+										"text": "@dev Cancel request to leave the set of collator candidates\n Selector: 0880b3e2\n @param candidateCount The number of candidates in the CandidatePool"
+									},
+									"functionSelector": "0880b3e2",
+									"id": 133,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "cancel_leave_candidates",
+									"nameLocation": "6008:23:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 131,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 130,
+												"mutability": "mutable",
+												"name": "candidateCount",
+												"nameLocation": "6040:14:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 133,
+												"src": "6032:22:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 129,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "6032:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6031:24:0"
+									},
+									"returnParameters": {
+										"id": 132,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6064:0:0"
+									},
+									"scope": 274,
+									"src": "5999:66:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 134,
+										"nodeType": "StructuredDocumentation",
+										"src": "6071:102:0",
+										"text": "@dev Temporarily leave the set of collator candidates without unbonding\n Selector: 767e0450"
+									},
+									"functionSelector": "767e0450",
+									"id": 137,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "go_offline",
+									"nameLocation": "6187:10:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 135,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6197:2:0"
+									},
+									"returnParameters": {
+										"id": 136,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6208:0:0"
+									},
+									"scope": 274,
+									"src": "6178:31:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 138,
+										"nodeType": "StructuredDocumentation",
+										"src": "6215:111:0",
+										"text": "@dev Rejoin the set of collator candidates if previously had called `go_offline`\n Selector: d2f73ceb"
+									},
+									"functionSelector": "d2f73ceb",
+									"id": 141,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "go_online",
+									"nameLocation": "6340:9:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 139,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6349:2:0"
+									},
+									"returnParameters": {
+										"id": 140,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6360:0:0"
+									},
+									"scope": 274,
+									"src": "6331:30:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 142,
+										"nodeType": "StructuredDocumentation",
+										"src": "6367:134:0",
+										"text": "@dev Request to bond more for collator candidates\n Selector: c57bd3a8\n @param more The additional amount self-bonded"
+									},
+									"functionSelector": "c57bd3a8",
+									"id": 147,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "candidate_bond_more",
+									"nameLocation": "6515:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 145,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 144,
+												"mutability": "mutable",
+												"name": "more",
+												"nameLocation": "6543:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 147,
+												"src": "6535:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 143,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "6535:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6534:14:0"
+									},
+									"returnParameters": {
+										"id": 146,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6557:0:0"
+									},
+									"scope": 274,
+									"src": "6506:52:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 148,
+										"nodeType": "StructuredDocumentation",
+										"src": "6564:290:0",
+										"text": "DEPRECATED, replaced by schedule_candidate_bond_less, execute_candidate_bond_request,\n cancel_candidate_bond_request\n @dev Request to bond less for collator candidates\n Selector: 289b6ba7\n @param less The amount to be subtracted from self-bond and unreserved"
+									},
+									"functionSelector": "289b6ba7",
+									"id": 153,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "candidate_bond_less",
+									"nameLocation": "6868:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 151,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 150,
+												"mutability": "mutable",
+												"name": "less",
+												"nameLocation": "6896:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 153,
+												"src": "6888:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 149,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "6888:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6887:14:0"
+									},
+									"returnParameters": {
+										"id": 152,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6910:0:0"
+									},
+									"scope": 274,
+									"src": "6859:52:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 154,
+										"nodeType": "StructuredDocumentation",
+										"src": "6917:158:0",
+										"text": "@dev Request to bond less for collator candidates\n Selector: 034c47bc\n @param less The amount to be subtracted from self-bond and unreserved"
+									},
+									"functionSelector": "034c47bc",
+									"id": 159,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "schedule_candidate_bond_less",
+									"nameLocation": "7089:28:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 157,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 156,
+												"mutability": "mutable",
+												"name": "less",
+												"nameLocation": "7126:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 159,
+												"src": "7118:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 155,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "7118:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "7117:14:0"
+									},
+									"returnParameters": {
+										"id": 158,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "7140:0:0"
+									},
+									"scope": 274,
+									"src": "7080:61:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 160,
+										"nodeType": "StructuredDocumentation",
+										"src": "7147:168:0",
+										"text": "@dev Execute pending candidate bond request\n Selector: a9a2b8b7\n @param candidate The address for the candidate for which the request will be executed"
+									},
+									"functionSelector": "a9a2b8b7",
+									"id": 165,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "execute_candidate_bond_less",
+									"nameLocation": "7329:27:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 163,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 162,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "7365:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 165,
+												"src": "7357:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 161,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "7357:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "7356:19:0"
+									},
+									"returnParameters": {
+										"id": 164,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "7384:0:0"
+									},
+									"scope": 274,
+									"src": "7320:65:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 166,
+										"nodeType": "StructuredDocumentation",
+										"src": "7391:73:0",
+										"text": "@dev Cancel pending candidate bond request\n Selector: 583d0fdc"
+									},
+									"functionSelector": "583d0fdc",
+									"id": 169,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "cancel_candidate_bond_less",
+									"nameLocation": "7478:26:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 167,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "7504:2:0"
+									},
+									"returnParameters": {
+										"id": 168,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "7515:0:0"
+									},
+									"scope": 274,
+									"src": "7469:47:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 170,
+										"nodeType": "StructuredDocumentation",
+										"src": "7522:460:0",
+										"text": "DEPRECATED, replaced by delegate\n @dev Make a nomination in support of a collator candidate\n Selector: 49df6eb3\n @param collator The address of the supported collator candidate\n @param amount The amount bonded in support of the collator candidate\n @param collatorNominationCount The number of nominations in support of the candidate\n @param nominatorNominationCount The number of existing nominations by the caller"
+									},
+									"functionSelector": "49df6eb3",
+									"id": 181,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "nominate",
+									"nameLocation": "7996:8:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 179,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 172,
+												"mutability": "mutable",
+												"name": "collator",
+												"nameLocation": "8022:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 181,
+												"src": "8014:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 171,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "8014:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 174,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "8048:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 181,
+												"src": "8040:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 173,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "8040:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 176,
+												"mutability": "mutable",
+												"name": "collatorNominationCount",
+												"nameLocation": "8072:23:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 181,
+												"src": "8064:31:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 175,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "8064:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 178,
+												"mutability": "mutable",
+												"name": "nominatorNominationCount",
+												"nameLocation": "8113:24:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 181,
+												"src": "8105:32:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 177,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "8105:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "8004:139:0"
+									},
+									"returnParameters": {
+										"id": 180,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "8152:0:0"
+									},
+									"scope": 274,
+									"src": "7987:166:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 182,
+										"nodeType": "StructuredDocumentation",
+										"src": "8159:421:0",
+										"text": "@dev Make a delegation in support of a collator candidate\n Selector: 829f5ee3\n @param candidate The address of the supported collator candidate\n @param amount The amount bonded in support of the collator candidate\n @param candidateDelegationCount The number of delegations in support of the candidate\n @param delegatorDelegationCount The number of existing delegations by the caller"
+									},
+									"functionSelector": "829f5ee3",
+									"id": 193,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "delegate",
+									"nameLocation": "8594:8:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 191,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 184,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "8620:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 193,
+												"src": "8612:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 183,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "8612:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 186,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "8647:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 193,
+												"src": "8639:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 185,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "8639:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 188,
+												"mutability": "mutable",
+												"name": "candidateDelegationCount",
+												"nameLocation": "8671:24:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 193,
+												"src": "8663:32:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 187,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "8663:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 190,
+												"mutability": "mutable",
+												"name": "delegatorDelegationCount",
+												"nameLocation": "8713:24:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 193,
+												"src": "8705:32:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 189,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "8705:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "8602:141:0"
+									},
+									"returnParameters": {
+										"id": 192,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "8752:0:0"
+									},
+									"scope": 274,
+									"src": "8585:168:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 194,
+										"nodeType": "StructuredDocumentation",
+										"src": "8759:288:0",
+										"text": "DEPRECATED, replaced by schedule_leave_delegators, execute_leave_delegators,\n cancel_leave_delegators\n @dev Request to leave the set of nominators\n Selector: b71d2153\n @param nominatorNominationCount The number of active nominations to be revoked by caller"
+									},
+									"functionSelector": "b71d2153",
+									"id": 199,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "leave_nominators",
+									"nameLocation": "9061:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 197,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 196,
+												"mutability": "mutable",
+												"name": "nominatorNominationCount",
+												"nameLocation": "9086:24:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 199,
+												"src": "9078:32:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 195,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "9078:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "9077:34:0"
+									},
+									"returnParameters": {
+										"id": 198,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "9120:0:0"
+									},
+									"scope": 274,
+									"src": "9052:69:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 200,
+										"nodeType": "StructuredDocumentation",
+										"src": "9127:74:0",
+										"text": "@dev Request to leave the set of delegators\n Selector: 65a5bbd0"
+									},
+									"functionSelector": "65a5bbd0",
+									"id": 203,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "schedule_leave_delegators",
+									"nameLocation": "9215:25:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 201,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "9240:2:0"
+									},
+									"returnParameters": {
+										"id": 202,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "9251:0:0"
+									},
+									"scope": 274,
+									"src": "9206:46:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 204,
+										"nodeType": "StructuredDocumentation",
+										"src": "9258:256:0",
+										"text": "@dev Execute request to leave the set of delegators and revoke all delegations\n Selector: a84a7468\n @param delegator The leaving delegator\n @param delegatorDelegationCount The number of active delegations to be revoked by delegator"
+									},
+									"functionSelector": "a84a7468",
+									"id": 211,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "execute_leave_delegators",
+									"nameLocation": "9528:24:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 209,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 206,
+												"mutability": "mutable",
+												"name": "delegator",
+												"nameLocation": "9570:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 211,
+												"src": "9562:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 205,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "9562:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 208,
+												"mutability": "mutable",
+												"name": "delegatorDelegationCount",
+												"nameLocation": "9597:24:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 211,
+												"src": "9589:32:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 207,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "9589:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "9552:75:0"
+									},
+									"returnParameters": {
+										"id": 210,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "9636:0:0"
+									},
+									"scope": 274,
+									"src": "9519:118:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 212,
+										"nodeType": "StructuredDocumentation",
+										"src": "9643:81:0",
+										"text": "@dev Cancel request to leave the set of delegators\n Selector: 2a987643"
+									},
+									"functionSelector": "2a987643",
+									"id": 215,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "cancel_leave_delegators",
+									"nameLocation": "9738:23:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 213,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "9761:2:0"
+									},
+									"returnParameters": {
+										"id": 214,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "9772:0:0"
+									},
+									"scope": 274,
+									"src": "9729:44:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 216,
+										"nodeType": "StructuredDocumentation",
+										"src": "9779:294:0",
+										"text": "DEPRECATED, replaced by schedule_revoke_delegation, execute_delegation_request,\n cancel_delegation_request\n @dev Request to revoke an existing nomination\n Selector: 4b65c34b\n @param collator The address of the collator candidate which will no longer be supported"
+									},
+									"functionSelector": "4b65c34b",
+									"id": 221,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "revoke_nomination",
+									"nameLocation": "10087:17:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 219,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 218,
+												"mutability": "mutable",
+												"name": "collator",
+												"nameLocation": "10113:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 221,
+												"src": "10105:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 217,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "10105:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "10104:18:0"
+									},
+									"returnParameters": {
+										"id": 220,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "10131:0:0"
+									},
+									"scope": 274,
+									"src": "10078:54:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 222,
+										"nodeType": "StructuredDocumentation",
+										"src": "10138:173:0",
+										"text": "@dev Request to revoke an existing delegation\n Selector: 22266e75\n @param candidate The address of the collator candidate which will no longer be supported"
+									},
+									"functionSelector": "22266e75",
+									"id": 227,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "schedule_revoke_delegation",
+									"nameLocation": "10325:26:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 225,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 224,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "10360:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 227,
+												"src": "10352:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 223,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "10352:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "10351:19:0"
+									},
+									"returnParameters": {
+										"id": 226,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "10379:0:0"
+									},
+									"scope": 274,
+									"src": "10316:64:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 228,
+										"nodeType": "StructuredDocumentation",
+										"src": "10386:334:0",
+										"text": "DEPRECATED, replaced by delegator_bond_more\n @dev Request to bond more for nominators with respect to a specific collator candidate\n Selector: 971d44c8\n @param candidate The address of the collator candidate for which nomination is increased\n @param more The amount by which the nomination is increased"
+									},
+									"functionSelector": "971d44c8",
+									"id": 235,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "nominator_bond_more",
+									"nameLocation": "10734:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 233,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 230,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "10762:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 235,
+												"src": "10754:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 229,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "10754:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 232,
+												"mutability": "mutable",
+												"name": "more",
+												"nameLocation": "10781:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 235,
+												"src": "10773:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 231,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "10773:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "10753:33:0"
+									},
+									"returnParameters": {
+										"id": 234,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "10795:0:0"
+									},
+									"scope": 274,
+									"src": "10725:71:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 236,
+										"nodeType": "StructuredDocumentation",
+										"src": "10802:273:0",
+										"text": "@dev Bond more for delegators with respect to a specific collator candidate\n Selector: f8331108\n @param candidate The address of the collator candidate for which delegation shall increase\n @param more The amount by which the delegation is increased"
+									},
+									"functionSelector": "f8331108",
+									"id": 243,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "delegator_bond_more",
+									"nameLocation": "11089:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 241,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 238,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "11117:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 243,
+												"src": "11109:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 237,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "11109:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 240,
+												"mutability": "mutable",
+												"name": "more",
+												"nameLocation": "11136:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 243,
+												"src": "11128:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 239,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "11128:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "11108:33:0"
+									},
+									"returnParameters": {
+										"id": 242,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "11150:0:0"
+									},
+									"scope": 274,
+									"src": "11080:71:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 244,
+										"nodeType": "StructuredDocumentation",
+										"src": "11157:406:0",
+										"text": "DEPRECATED, replaced by schedule_delegator_bond_less, execute_delegation_request,\n cancel_delegation_request\n @dev Request to bond less for nominators with respect to a specific collator candidate\n Selector: f6a52569\n @param candidate The address of the collator candidate for which nomination is decreased\n @param less The amount by which the nomination is decreased"
+									},
+									"functionSelector": "f6a52569",
+									"id": 251,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "nominator_bond_less",
+									"nameLocation": "11577:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 249,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 246,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "11605:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 251,
+												"src": "11597:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 245,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "11597:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 248,
+												"mutability": "mutable",
+												"name": "less",
+												"nameLocation": "11624:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 251,
+												"src": "11616:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 247,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "11616:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "11596:33:0"
+									},
+									"returnParameters": {
+										"id": 250,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "11638:0:0"
+									},
+									"scope": 274,
+									"src": "11568:71:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 252,
+										"nodeType": "StructuredDocumentation",
+										"src": "11645:301:0",
+										"text": "@dev Request to bond less for delegators with respect to a specific collator candidate\n Selector: 00043acf\n @param candidate The address of the collator candidate for which delegation shall decrease\n @param less The amount by which the delegation is decreased (upon execution)"
+									},
+									"functionSelector": "00043acf",
+									"id": 259,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "schedule_delegator_bond_less",
+									"nameLocation": "11960:28:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 257,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 254,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "11997:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 259,
+												"src": "11989:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 253,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "11989:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 256,
+												"mutability": "mutable",
+												"name": "less",
+												"nameLocation": "12016:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 259,
+												"src": "12008:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 255,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "12008:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "11988:33:0"
+									},
+									"returnParameters": {
+										"id": 258,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "12038:0:0"
+									},
+									"scope": 274,
+									"src": "11951:88:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 260,
+										"nodeType": "StructuredDocumentation",
+										"src": "12045:200:0",
+										"text": "@dev Execute pending delegation request (if exists && is due)\n Selector: e42366a6\n @param delegator The address of the delegator\n @param candidate The address of the candidate"
+									},
+									"functionSelector": "e42366a6",
+									"id": 267,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "execute_delegation_request",
+									"nameLocation": "12259:26:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 265,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 262,
+												"mutability": "mutable",
+												"name": "delegator",
+												"nameLocation": "12294:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 267,
+												"src": "12286:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 261,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "12286:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 264,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "12313:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 267,
+												"src": "12305:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 263,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "12305:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "12285:38:0"
+									},
+									"returnParameters": {
+										"id": 266,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "12340:0:0"
+									},
+									"scope": 274,
+									"src": "12250:91:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 268,
+										"nodeType": "StructuredDocumentation",
+										"src": "12347:168:0",
+										"text": "@dev Cancel pending delegation request (already made in support of input by caller)\n Selector: 7284cf50\n @param candidate The address of the candidate"
+									},
+									"functionSelector": "7284cf50",
+									"id": 273,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "cancel_delegation_request",
+									"nameLocation": "12529:25:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 271,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 270,
+												"mutability": "mutable",
+												"name": "candidate",
+												"nameLocation": "12563:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 273,
+												"src": "12555:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 269,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "12555:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "12554:19:0"
+									},
+									"returnParameters": {
+										"id": 272,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "12582:0:0"
+									},
+									"scope": 274,
+									"src": "12520:63:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								}
+							],
+							"scope": 275,
+							"src": "374:12211:0",
+							"usedErrors": []
+						}
+					],
+					"src": "41:12544:0"
+				},
+				"id": 0
+			}
+		}
+	}
+}
