@@ -1,0 +1,10 @@
+exit
+await mytoken.balanceOf('0x3aCaAB9fE5b1FCEf389963E12B9B3D014cc3610A')
+await mytoken.balanceof('0x3aCaAB9fE5b1FCEf389963E12B9B3D014cc3610A')
+await mytoken.transfer('0x3aCaAB9fE5b1FCEf389963E12B9B3D014cc3610A',1000000)
+await mytoken.symbol()
+await mytoken.totalSupply()
+await mytoken.name()
+console.log(mytoken);
+const mytoken = await MyToken.attach('0x8C58248e82D705Bf8b08C027eAa8FF3Acd940c1b');
+const MyToken = await ethers.getContractFactory('MyToken');
