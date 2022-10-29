@@ -86,13 +86,207 @@ https://appbhteffsi3308.h5.xiaoeknow.com/p/course/video/v_6336a8efe4b0a51fef22ee
 
 ## 2.4 XCM 频道注册
 
-1. 注册频道信息格式
+1. 注册频道信息格式，（parachain ID,max-capacity,max-message-size）
+2. 购买中继链执行时间（注册频道需要在中继链执行，所以需要购买中继链的执行时间）
+3. 频道注册需要绑定一定的KSM或者DOT，20DOT or KSM 10,可以使用KSMchainstate.configuration.activeConfig来查询
+4. 注册流程：某条链发起注册请求，目的链接受请求
+5. HRMP可视化工具：https://dotsama-channels.vercel.app/#/
 
-## XC - 20 标准
+## 2.5 XCM频道信息查询
 
-## 资产代表方式
+1. 关于注册的查询
 
-## 转账流程
+KSMchainstate.configuration.activeConfig
+
+```
+configuration.activeConfig: PolkadotRuntimeParachainsConfigurationHostConfiguration
+{
+  --
+  hrmpSenderDeposit: 5,000,000,000,000
+  hrmpRecipientDeposit: 5,000,000,000,000
+  hrmpChannelMaxCapacity: 1,000
+  hrmpChannelMaxTotalSize: 102,400
+  --
+}
+```
+
+2. 查看所有链的请求
+
+KSM chainstate.hrmp.hrmpOpenChannelRequestsList()
+
+```
+[
+  {
+    sender: 2,085 // 请求链的ID
+    recipient: 2,084 //接收链的ID
+  }
+ --
+]
+```
+
+3. 查看平行链ID
+
+```
+https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fkusama.api.onfinality.io%2Fpublic-ws#/parachains
+```
+
+## 2.6 交易费用的计算
+
+可以使用任何双方平行链都接受的资产作为交易费用
+
+1. 购买执行时间（Holding1 register拥有此资产 & 目标链接受此资产）
+2. 多种付费策略（直接收原声代币；接收指定的非原生代币；接收非原生代币，但是转为原生代币；不接受原生代币）
+
+## 2.7 XCM操作指令
+
+每个操作指令都有相应的重量（执行成本，类似以太坊的gas）
+
+1. WithdrawAsset：将资产转入Holding Register
+2. DepositAsset: 从Holding Register移出资产
+3. TransferAsset：将资产转移给某一位受益人
+4. Transact：尝试在链上调用某个方法
+5. BuyExecution：使用Holding Register内的资金购买执行时间
+6. SubscribeVersion：要求更改目标链支持的XCM版本
+
+## 2.8 主权账户
+
+1. 平行链拥有的账户（在另外一条链上）
+2. 持有正在发送的资金（类似于以太坊的锁定合约）
+3. 地址由确定性算法生成 （衍生于Parachain ID: 哈希平行链ID，然后拼凑在其他特定字符串中）
+4. 如何计算主权账户的（使用如下脚本文件计算，提供两个参数 parachain ID和 中继链name（polkadot/kusama/moonbase)
+
+moonbeam/advanced-courses/xcmTools
+
+```
+ts-node calculateSovereignAddress.ts --paraid 2023 --relay kusama/polkadot/moonbase(三个中继链算出来的是一样的，不受中继链的影响)
+```
+
+```
+2022-10-29 09:23:52        API/INIT: RPC methods not decorated: mmr_generateBatchProof
+Sovereign Account Address on Relay: 0x70617261e7070000000000000000000000000000000000000000000000000000
+Sovereign Account Address on other Parachains (Generic): 0x7369626ce7070000000000000000000000000000000000000000000000000000
+Sovereign Account Address on Moonbase Alpha: 0x7369626ce7070000000000000000000000000000
+```
+
+## 2.9 Moonbeam XC-20 标准
+
+### 2.9.1 XC-20资产
+
+1. 是moonbeam的以太坊兼容解决方案
+
+2. 这些资产既可以跨链跨链和交易,也可以轻松集成到Moonbeam EVM生态中
+
+3. 查看现有的xc-20资产
+
+https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fmoonbeam.public.blastapi.io#/assets
+
+https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fwss.api.moonriver.moonbeam.network#/assets
+
+### 2.9.2 可铸造的XC-20资产
+
+1. 使用Substrate Assets pallet铸造，实在moonbeam本地铸造的资产
+2. 通过EVM管理，可以与智能合约直接交互
+3. 可以轻松跨链交易
+
+## 2.10 XC-20资产的代表方式
+
+### 2.10.1 代表方式1:Multilocations
+
+一种在波卡生态代表“位置”的方法
+
+1. 类似文件存储的路径系统（采用相对路径命名方式；本地资产或者账户不用穿越“parents”或中继链；其他链上的账户和资产则需要）
+2. 资产,账户和平行链都可以用Multilocation来代表
+3. 因为是相对路径，所以需要考虑调用的起源点是哪里
+4. Multilocation：数据结构
+
+```
+组成部分：parents 和 interior
+parents = 0 或 1，代表是否要跨越中继链
+interior 代表定义目标位置；X_代表几个字段，X1代表1个字段，X2代表2个字段
+```
+
+![image-20221029100843180](/Users/qinjianquan/Library/Application Support/typora-user-images/image-20221029100843180.png)
+
+### 2.10.2 资产代表方式2:资产ID （Asset ID）
+
+1. 也称Currency ID
+2. 10 进制数字
+3. SelfReserve 指本地原生代币（mover等）
+4. ForeignAsset指XC-20的资产ID
+5. 可以从Multilocation计算（计算资产ID）
+6. 可以在polkadot.js apps钱包的asset下查看
+
+### 2.10.3 资产代表方式3:XC-20预编译合约地址
+
+1. 从Multilocation 和资产ID计算
+
+```
+address = "0xFFFFFFF..." + DecimalToHex(AssetId)
+```
+
+2. 以太坊合约地址格式
+3. 代表一个X-20资产的ERC-20预编译地址
+
+## 2.11 计算资产ID和XC-20预编译地址
+
+moonbeam/advanced-courses/xcmTools
+
+1. 从moonbeam到平行链ID2007的PalletInstance 3
+
+表示方式1: Multilocation
+
+```
+{"parents":1,"interior":{"X2":[{"Parachain":2007},{"PalletInstance":3}]}}
+```
+
+表示方式2&3: 资产ID和预编译合约地址（需要计算利用Multilocation计算，计算时有两个参数，1是起源地如moonbeam，2是mutilocation定义）
+
+```
+ts-node calculateMultilocationInfo.ts --n 'moonbeam' --a '{"parents":1,"interior":{"X2":[{"Parachain":2007},{"PalletInstance":3}]}}'
+```
+
+```
+2022-10-29 10:34:13        API/INIT: RPC methods not decorated: eth_feeHistory, eth_maxPriorityFeePerGas, moon_isBlockFinalized, moon_isTxFinalized
+Storage Key 0x1da53b775b270400e7e61ed5cbc5a146ea70f53d5a3306ce02aaf97049cf181a70e256f880a1a59a7df53ce93aa980d1ffffffff393d731822b042dcf547635f1a4d0524 //subtrate存储资产的内存地址
+Asset Address Precompile: 0xffffffff393d731822b042dcf547635f1a4d0524
+Asset ID is 76085060257426726555623896097844167972
+```
+
+2. 从平行链到中继链的原生代币（interior = "Here" = [] = null）
+
+表示方式1: Multilocation
+
+```
+{"parents":1}
+```
+
+表示方式2&3: 资产ID和预编译合约地址（需要计算利用Multilocation计算，计算时有两个参数，1是起源地如moonbeam，2是mutilocation定义）
+
+```
+ts-node calculateMultilocationInfo.ts --n 'moonbeam' --a '{"parents":1}'
+```
+
+```
+2022-10-29 10:50:25        API/INIT: RPC methods not decorated: eth_feeHistory, eth_maxPriorityFeePerGas, moon_isBlockFinalized, moon_isTxFinalized
+Storage Key 0x1da53b775b270400e7e61ed5cbc5a146ea70f53d5a3306ce02aaf97049cf181a1f720ca3a567a7892f51ba4eabe649ccffffffff1fcacbd218edc0eba20fc2308c778080
+Asset Address Precompile: 0xffffffff1fcacbd218edc0eba20fc2308c778080
+Asset ID is 42259045809535163221576417993425387648
+```
+
+## 2.12 XCM转账流程
+
+### 2.12.1 XCM转账机制
+
+1. 传送（在第一条链上现焚毁资产，然后在第二条链上再铸造）要求两条链完全信任
+2. 远程转账 （起源链锁定资产，然后再目标链上铸造，然后在起源链焚毁，再解锁，由主权账户完成）
+
+### 2.12.2 从中继链向平行链转账
+
+先在中继链上将资产转到其在中继链上的主权账户，主权账户锁定该笔资产，同时发送XCM信息给平行链，要求平行链铸造相等数额的xc资产并将其转给平行链上的目标账户，然后再发送信息给中继链上的主权账户发送已经铸造完毕信息，主权账户焚毁中继链上锁定的资产
+
+### 2.12.3 平行链向平行链转账
+
+先在平行链上将资产转到目标平行链在中继链上的主权账户，主权账户锁定该笔资产，目标平行链铸造相等数额的xc资产并将其转给平行链上的目标账户，目标平行链主权账户焚毁中继链上锁定起源平行链的资产
 
 {"parents":1}
 
